@@ -28,11 +28,11 @@ class interpolation:
 
         return data_points
     def zdirection(self,l):
-        valuesz = np.array(value[l::40])
+        valuesz = np.array(value[l::41])
         return valuesz
     def zdircord(self,l):
         zcord = []
-        zcord1 = np.array(z[l::40])
+        zcord1 = np.array(z[l::41])
 
 
         return zcord1
@@ -44,9 +44,9 @@ class interpolation:
         return b
     def interpolate(self,x,l):
         y = 0
-        for j in range(80):
+        for j in range(81):
             t = 1
-            for m in range(80):
+            for m in range(81):
                 if m != j:
                     t = t*self.basis(x,j,m,l)
             y += t*self.zdirection(l)[j]

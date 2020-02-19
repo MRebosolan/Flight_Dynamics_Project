@@ -27,6 +27,6 @@ pointnum2 = pointnum - 1
 i = interpolation()
 ill = np.linspace(0,-0.5456,pointnum)
 y = i.interpolate(ill,20)
-print()
+print(multiplicator(y))
 integral = numerical_integrator1d(y,pointnum)
 print(integral)
