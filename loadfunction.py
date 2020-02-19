@@ -12,8 +12,8 @@ def coordinates():
     ylist = []
     xlist = []
     zlist = []
-    for i in range(1,len(data_points)):
-        for j in range(1,len(data_points[0])):
+    for i in range(1,(len(data_points)+1)):
+        for j in range(1,(len(data_points[0])+1)):
             thetaz = (((i-1)*pi)/81)
             thetazplus = (((i)*pi)/81)
             zcoord = (-0.5)*((ca/2)*(1-cos(thetaz))+(ca/2)*(1-cos(thetazplus)))
@@ -23,13 +23,13 @@ def coordinates():
             #print(zcoord)
             #print(xcoord)
             #print(data_points[i][j])
-            point = [data_points[i][j],zcoord,xcoord]
-            ylist.append(data_points[i][j])
+            #point = [data_points[i][j],zcoord,xcoord]
+            ylist.append(data_points[i-1][j-1])
             xlist.append(xcoord)
             zlist.append(zcoord)
     return ylist,xlist,zlist
 ylist,xlist,zlist = coordinates()
-
+print(len(xlist))
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection = '3d')
 ax.scatter(xlist,zlist,ylist)

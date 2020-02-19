@@ -56,14 +56,10 @@ class interpolation:
         #return np.sum([[np.dot(self.basis(x,j),self.zdirection()[j])]for j in range(1,41)])
 
 
-
+'''
 i = interpolation()
-print(len(i.zdircord(1)))
-print(len(i.zdirection(1)))
-#X = i.zdircord(l)
-#print(X)
-#print(i.zdirection(l))
-ill = np.linspace(0,-0.5456,162)
+
+ill = np.linspace(0,-0.5456,400)
 y = []
 list = []
 #for l in range(41):
@@ -72,10 +68,10 @@ list = []
 l = 10
 for element in ill:
     y.append(i.interpolate(element,l))
-
+print(len(y))
 pyplot.plot(ill,y)
 pyplot.show()
-
+'''
 
 
 
