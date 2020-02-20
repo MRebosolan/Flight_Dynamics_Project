@@ -70,7 +70,7 @@ def alternative_q_base_top1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
         q_base_list.append(q_base_i)
         i+=1
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 def alternative_q_base_bottom1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, integral_step, aileron_height, skin_thickness,z_pos,y_pos):
     #first part a: determining the integral of thickness and position with respect to y
@@ -119,7 +119,7 @@ def alternative_q_base_bottom1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_
         q_base_list.append(q_base_i)
         i+=1
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 
 def alternative_q_base_top2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness,z_pos,y_pos):
@@ -169,7 +169,7 @@ def alternative_q_base_top2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
         q_base_list.append(q_base_i)
         i+=1
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 def alternative_q_base_bottom2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness,z_pos,y_pos):
     #first part a: determining the integral of thickness and position with respect to y
@@ -218,7 +218,7 @@ def alternative_q_base_bottom2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_
         q_base_list.append(q_base_i)
         i+=1
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 def alternative_q_base_spar(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness,y_pos):
     #first part : determining the integral of thickness and position with respect to y
@@ -243,12 +243,12 @@ def alternative_q_base_spar(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
     #second part: determing the actual q_base for the point with position y and z
     q_base_list=[]
     i=0
-    while i<=(len(integral_values2)-1):
+    while i<=(len(integral_values1)-1):
         q_base_i= - shear_force_y*integral_values1[i]/MOI_z_prime
         q_base_list.append(q_base_i)
         i+=1
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 def alternative_q_base_sparA(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness,y_pos):
     #first part : determining the integral of thickness and position with respect to y
@@ -273,12 +273,12 @@ def alternative_q_base_sparA(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pr
     #second part: determing the actual q_base for the point with position y and z
     q_base_list=[]
     i=0
-    while i<=(len(integral_values2)-1):
+    while i<=(len(integral_values1)-1):
         q_base_i= - shear_force_y*integral_values1[i]/MOI_z_prime
         q_base_list.append(q_base_i)
         i+=1
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 def alternative_q_base_sparB(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness,y_pos):
     #first part : determining the integral of thickness and position with respect to y
@@ -303,12 +303,12 @@ def alternative_q_base_sparB(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pr
     #second part: determing the actual q_base for the point with position y and z
     q_base_list=[]
     i=0
-    while i<=(len(integral_values2)-1):
+    while i<=(len(integral_values1)-1):
         q_base_i= - shear_force_y*integral_values1[i]/MOI_z_prime
         q_base_list.append(q_base_i)
         i+=1 
     
-    return q_base_list
+    return q_base_list, s_1_values
 
 def total_q_i(base_shear,torque_shear, zero_shear):
     total_q_i=base_shear+torque_shear+zero_shear
