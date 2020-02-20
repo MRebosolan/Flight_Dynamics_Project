@@ -53,4 +53,30 @@ def max_stress_validation(max_stress_actual, max_stress_validation, x_location_a
     #the switch which is returned labels wether the maximum stress is located on the same member of the aileron cross section or not
     #these are defined at the beginning of the program of defintions for validation
     return error_max_stress, switch, diff_x
-        
+
+'''
+def reading_input(file_name):
+    file=open(file_name)
+    lst=[]
+    for x in file:
+        lst.append(x)
+    file.close()
+    
+    for i in range(len(lst)):
+
+
+f = open("B737(1).INP")
+lst=[]
+for x in file:
+  for i in range(len(x)):
+      for k in range(1,10):
+          if x[i]==k:
+              lst.append(k)
+'''
+
+np.loadtxt('B737(1).INP', usecols=range(1,8))
+
+
+
+
+
