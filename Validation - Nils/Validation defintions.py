@@ -7,6 +7,7 @@ Created on Thu Feb 20 11:25:00 2020
 
 import numpy as np
 import math
+import re
 
 #defintion of members:
 #top1===> the y positive part of the circular section of the aileron [1]
@@ -54,29 +55,74 @@ def max_stress_validation(max_stress_actual, max_stress_validation, x_location_a
     #these are defined at the beginning of the program of defintions for validation
     return error_max_stress, switch, diff_x
 
-'''
-def reading_input(file_name):
+def reading_inputs(file_name):
     file=open(file_name)
     lst=[]
     for x in file:
-        lst.append(x)
+        a=re.split(' |, |\|n|\n', x)
+        lst.append(a)
+        
+    lst2=[]
+    for i in range(9,6597):
+        lst2.append(lst[i])
+    
+    
+    lst3=[]
+    for k in range(len(lst2)):
+        lst4=[]
+        for i in range(len(lst2[k])):
+            if lst2[k][i]!='':
+                lst4.append(float(lst2[k][i]))
+        lst3.append(lst4)
     file.close()
     
-    for i in range(len(lst)):
+    lst4=[]
+    for i in range(len(lst3)):
+        if lst3[i][2]==0 and lst3[i][3]==0:
+            lst4.append(lst3[i])
+    
+    #lst 4 gives an output list of each line [node number, x, y, z]. The outputs are only the nodes which are on the hinge line
+    return lst4
 
+def reading_outputs_deflections(file_name, interest_nodes):
+    
+    file=open(file_name)
+    lst=[]
+    for x in file:
+        a=re.split(' |, |\|n|\n', x)
+        lst.append(a)
 
-f = open("B737(1).INP")
-lst=[]
-for x in file:
-  for i in range(len(x)):
-      for k in range(1,10):
-          if x[i]==k:
-              lst.append(k)
-'''
+    lst2=[]
+    for i in range(26724,33312):
+        lst2.append(lst[i])
+    
+    
+    lst3=[]
+    for k in range(len(lst2)):
+        lst4=[]
+        for i in range(len(lst2[k])):
+            if lst2[k][i]!='':
+                lst4.append(float(lst2[k][i]))
+        lst3.append(lst4)
+    file.close()
+    
+    lst4=[]
+    for i in range(len(lst3)):
+        for j in range(len(interest_nodes)):
+            if lst3[i][0]==interest_nodes[j][0]:
+                lst4.append(lst3[i])
+                
+    return len(lst4), lst4
 
-np.loadtxt('B737(1).INP', usecols=range(1,8))
-
-
-
+def computing_outputs_twist(shear_center_y, shear_center_z):
+    
+    deflections_y_and_z_hinge_lines=reading_outputs_deflections('B737(2).RPT', reading_inputs('B737(1).INP'))[1]
+    print(deflections_y_and_z_hinge_lines)
+    lst_final_values=[]
+    for i in range(len(deflections_y_and_z_hinge_lines)):
+        twist=np.arctan((deflections_y_and_z_hinge_lines[i][3]-shear_center_y)/(shear_center_z-deflections_y_and_z_hinge_lines[i][4]))
+        lst_final_values.append([deflections_y_and_z_hinge_lines[i][0],deflections_y_and_z_hinge_lines[i][1], deflections_y_and_z_hinge_lines[i][2], deflections_y_and_z_hinge_lines[i][3], deflections_y_and_z_hinge_lines[i][4], twist])
+    return lst_final_values    
+print(computing_outputs_twist(0,-3))
 
 
