@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """
 Created on Mon Feb 17 12:32:42 2020
-
 @author: lizzy & richelle
 """
 import numpy as np
@@ -113,4 +111,14 @@ yc=0                            #due to symmetry
 #recalculated again due to big difference with verification model
 
 "Moment of Inertia"
+angle = m.degrees(m.atan(R/(Ca-R)))
+print("angle is:", angle)
 
+length_beam = m.sqrt(R**2+(Ca-R)**2)
+print("length beam is:", length_beam)
+
+Iyy_straight = 2*((tsk*length_beam*m.cos(angle)*m.cos(angle))/12) #2 beams
+print("Moment of inertia of straight skin parts Iyy is:", Iyy_straight)
+
+Izz_straight = 2*((tsk*length_beam*m.sin(angle)*m.sin(angle))/12) #2 beams
+print("Moment of inertia of straight skin parts Izz is:", Izz_straight)
