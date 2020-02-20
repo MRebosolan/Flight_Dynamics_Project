@@ -121,24 +121,24 @@ angle = m.atan(R/(Ca-R))
 length_beam = m.sqrt(R**2+(Ca-R)**2)
 
 
-Iyy_straight = 2*((tsk*length_beam**(3)*m.cos(angle)*m.cos(angle))/12+A_sk2*((Ca-R)/2)**2) #2 beams
-#print("Moment of inertia of straight skin parts Iyy is:", Iyy_straight, "m^4")
+Iyy_straight = ((tsk*length_beam**(3)*m.cos(angle)*m.cos(angle))/12+A_sk2*((Ca-R)/2-zc)**2) #2 beams
+print("Moment of inertia of straight skin parts Iyy is:", Iyy_straight, "m^4")
 
-Izz_straight = 2*((tsk*length_beam**(3)*m.sin(angle)*m.sin(angle))/12+A_sk2*(R/2)**2) #2 beams
-#print("Moment of inertia of straight skin parts Izz is:", Izz_straight, "m^4")
+Izz_straight = ((tsk*length_beam**(3)*m.sin(angle)*m.sin(angle))/12+A_sk2*(R/2)**2) #2 beams
+print("Moment of inertia of straight skin parts Izz is:", Izz_straight, "m^4")
 
 #Calculate moment of inertia of arc skin part
-Izz_arc = 1.5*m.pi*tsk*R**3
-Iyy_arc = 0.5*m.pi*tsk*R**3+A_sk1*(2*R/m.pi)**2
-#print("Moment of inertia of arc skin part Iyy is:", Iyy_arc, "m^4")
-#print("Moment of inertia of arc skin part Izz is:", Izz_arc, "m^4")
+Izz_arc = 1/2*m.pi*tsk*R**3
+Iyy_arc = 1/2*m.pi*tsk*R**3+A_sk1*(2*R/m.pi+zc)**2
+print("Moment of inertia of arc skin part Iyy is:", Iyy_arc, "m^4")
+print("Moment of inertia of arc skin part Izz is:", Izz_arc, "m^4")
 
 #Calculate moment of inertia of spar
 Izz_spar = (tsp*ha**3)/12
-Iyy_spar = 0
+Iyy_spar = A_sp*(zc)**2
 
-#print("Moment of inertia of spar Iyy is:", Iyy_spar,"m^4")
-#print("Moment of inertia of spar Izz is:", Izz_spar, "m^4")
+print("Moment of inertia of spar Iyy is:", Iyy_spar,"m^4")
+print("Moment of inertia of spar Izz is:", Izz_spar, "m^4")
 
 #Calculate moment of inertia of stiffners
 values_Ady=[]
@@ -150,15 +150,16 @@ Izz_st=sum(values_Ady)
 
 values_Adz=[]
 for i in z_stringer:
-    dz=i**2
+    dz=(i-zc)**2
     Adz=A_st*dz
     values_Adz.append(Adz)
 Iyy_st=sum(values_Adz)
-#print("Moment of inertia of stiffners Izz is:", Izz_st, "m^4") 
-#print("Moment of inertia of stiffners Iyy is:", Iyy_st, "m^4")
+
+print("Moment of inertia of stiffners Izz is:", Izz_st, "m^4") 
+print("Moment of inertia of stiffners Iyy is:", Iyy_st, "m^4")
 #Calculate total moment of inertia 
-Iyy_total = Iyy_straight + Iyy_arc + Iyy_spar + Iyy_st
-Izz_total = Izz_straight + Izz_arc + Izz_spar + Izz_st
+Iyy_total = 2*Iyy_straight + Iyy_arc + Iyy_spar + Iyy_st
+Izz_total = 2*Izz_straight + Izz_arc + Izz_spar + Izz_st
 
 print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
