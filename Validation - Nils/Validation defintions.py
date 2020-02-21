@@ -123,6 +123,6 @@ def computing_outputs_twist(shear_center_y, shear_center_z):
         twist=np.arctan((deflections_y_and_z_hinge_lines[i][3]-shear_center_y)/(shear_center_z-deflections_y_and_z_hinge_lines[i][4]))
         lst_final_values.append([deflections_y_and_z_hinge_lines[i][0],deflections_y_and_z_hinge_lines[i][1], deflections_y_and_z_hinge_lines[i][2], deflections_y_and_z_hinge_lines[i][3], deflections_y_and_z_hinge_lines[i][4], twist])
     return lst_final_values    
-print(computing_outputs_twist(0,-3))
+
 
 

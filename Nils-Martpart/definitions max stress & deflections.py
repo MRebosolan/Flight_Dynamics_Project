@@ -503,7 +503,7 @@ def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to st
     
 def deflection_due_to_torque_and_bending(twist, shear_center_y, shear_center_z, deflection_y_bending, deflection_z_bending):
     distance=math.sqrt(shear_center_y**2+shear_center_z**2)
-    delta_deflec_y_torque=twist*distance
+    delta_deflec_y_torque=np.sin(twist)*distance
     delta_deflec_z_torque=distance*(1-np.cos(twist))
     deflection_y=delta_deflec_y_torque+deflection_y_bending
     deflection_z=delta_deflec_z_torque+deflection_z_bending
