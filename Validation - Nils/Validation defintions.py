@@ -114,9 +114,8 @@ def reading_outputs_deflections(file_name, interest_nodes):
                 
     return len(lst4), lst4
 
-def computing_outputs_twist(shear_center_y, shear_center_z):
+def computing_outputs_twist(deflections_y_and_z_hinge_lines, shear_center_y, shear_center_z):
     
-    deflections_y_and_z_hinge_lines=reading_outputs_deflections('B737(2).RPT', reading_inputs('B737(1).INP'))[1]
     print(deflections_y_and_z_hinge_lines)
     lst_final_values=[]
     for i in range(len(deflections_y_and_z_hinge_lines)):
