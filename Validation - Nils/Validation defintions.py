@@ -84,7 +84,7 @@ def reading_inputs(file_name):
     #lst 4 gives an output list of each line [node number, x, y, z]. The outputs are only the nodes which are on the hinge line
     return lst4
 
-def reading_outputs_deflections(file_name, interest_nodes):
+def reading_outputs_deflections_bent(file_name, interest_nodes):
     
     file=open(file_name)
     lst=[]
@@ -114,9 +114,79 @@ def reading_outputs_deflections(file_name, interest_nodes):
                 
     return len(lst4), lst4
 
-def computing_outputs_twist(deflections_y_and_z_hinge_lines, shear_center_y, shear_center_z):
+def reading_outputs_deflections_unbent(file_name, interest_nodes):
     
-    print(deflections_y_and_z_hinge_lines)
+    file=open(file_name)
+    lst=[]
+    for x in file:
+        a=re.split(' |, |\|n|\n', x)
+        lst.append(a)
+
+    lst2=[]
+    for i in range(33374,39962):
+        lst2.append(lst[i])
+    
+    
+    lst3=[]
+    for k in range(len(lst2)):
+        lst4=[]
+        for i in range(len(lst2[k])):
+            if lst2[k][i]!='':
+                lst4.append(float(lst2[k][i]))
+        lst3.append(lst4)
+    file.close()
+    
+    lst4=[]
+    for i in range(len(lst3)):
+        for j in range(len(interest_nodes)):
+            if lst3[i][0]==interest_nodes[j][0]:
+                lst4.append(lst3[i])
+                
+    return len(lst4), lst4
+
+def reading_outputs_deflections_pure_bending(file_name, interest_nodes):
+    
+    file=open(file_name)
+    lst=[]
+    for x in file:
+        a=re.split(' |, |\|n|\n', x)
+        lst.append(a)
+
+    lst2=[]
+    for i in range(20075,26662):
+        lst2.append(lst[i])
+    
+    
+    lst3=[]
+    for k in range(len(lst2)):
+        lst4=[]
+        for i in range(len(lst2[k])):
+            if lst2[k][i]!='':
+                lst4.append(float(lst2[k][i]))
+        lst3.append(lst4)
+    file.close()
+    
+    lst4=[]
+    for i in range(len(lst3)):
+        for j in range(len(interest_nodes)):
+            if lst3[i][0]==interest_nodes[j][0]:
+                lst4.append(lst3[i])
+                
+    return len(lst4), lst4
+
+def average_y_z_deflections_due_to_torque_validated_data(deflection_y_z_unbent, deflection_y_z_bent, deflection_y_z_bending):
+    lst=[]
+    for i in range(len(deflection_y_z_unbent)):
+        D=(deflection_y_z_unbent[i][3]+(deflection_y_z_bent[i][3]-deflection_y_z_bending[i][3]))/2
+        C=(deflection_y_z_unbent[i][4]+(deflection_y_z_bent[i][4]-deflection_y_z_bending[i][4]))/2
+        E=math.sqrt(C**2+D**2)
+        lst.append([deflection_y_z_unbent[i][0],D,C,E])
+    
+    return lst
+
+def computing_outputs_twist(deflections_y_and_z_hinge_lines, shear_center_y, shear_center_z):
+    #these deflection in y and z are calculated by take the average of the unbent case and the dif. between the bent and pure bending case
+    
     lst_final_values=[]
     for i in range(len(deflections_y_and_z_hinge_lines)):
         twist=np.arctan((deflections_y_and_z_hinge_lines[i][3]-shear_center_y)/(shear_center_z-deflections_y_and_z_hinge_lines[i][4]))
