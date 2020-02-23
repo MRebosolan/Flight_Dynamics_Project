@@ -35,11 +35,12 @@ k=b/R #radians
 r=10000
 z_coordinates=[]
 y_coordinates=[]
+A_st=(hst-tst)*tst+tst*wst
 
 "Stringer placement"
 z_stringer=[] 
 y_stringer=[]
-
+stringer_array=[]
 for n in range(0,100000):
     z=-R*m.cos(n*b/(R))
     y=R*m.sin(n*b/(R))
@@ -58,17 +59,19 @@ for n in range(0,100000):
                 z_stringer.append(z)
                 y_stringer.append(y)
                 y_stringer.append(-y)
+                stringer_array.append([A_st,z,y])
+                stringer_array.append([A_st,z,-y])
             elif z>(Ca-R):
                 break
     elif n<3:
         z_stringer.append(z)
         y_stringer.append(y)
+        stringer_array.append([A_st,z,y])      
         if n>0:
             z_stringer.append(z)
             y_stringer.append(-y)
-
-
-
+            stringer_array.append([A_st,z,-y])
+            
 "airfoil placement"
 for i in range(0,r):
     z=-R+R*i/(r-1)
@@ -82,7 +85,7 @@ for i in range(0,101):
     z_coordinates.append(z)
     y_coordinates.append(y)
 
-for i in range(100,0):
+for i in range(101,0):
     z=i*(Ca-R)/100
     y=-R/(Ca-R)*z+R
     z_coordinates.append(z)
@@ -103,7 +106,7 @@ plt.plot(z_stringer,y_stringer, marker="x")
 A_sk1=m.pi*R*tsk
 A_sk2=m.sqrt((Ca-R)**2+R**2)*tsk
 A_sp=ha*tsp
-A_st=(hst-tst)*tst+tst*wst
+
 A_tot=A_sk1+2*A_sk2+A_sp+17*A_st
 print("Total area:", A_tot, "m^2")
 
@@ -129,7 +132,7 @@ print("Moment of inertia of straight skin parts Izz is:", Izz_straight, "m^4")
 
 #Calculate moment of inertia of arc skin part
 Izz_arc = 1/2*m.pi*tsk*R**3         #
-Iyy_arc = 1/2*m.pi*tsk*R**3+A_sk1*(2*R/m.pi+zc)**2
+Iyy_arc = 1/2*m.pi*tsk*R**3-4*R**3*tsk/m.pi+A_sk1*(2*R/m.pi+zc)**2
 print("Moment of inertia of arc skin part Iyy is:", Iyy_arc, "m^4")
 print("Moment of inertia of arc skin part Izz is:", Izz_arc, "m^4")
 
