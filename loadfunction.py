@@ -29,7 +29,7 @@ def coordinates():
             zlist.append(zcoord)
     return ylist,xlist,zlist
 ylist,xlist,zlist = coordinates()
-print(len(xlist))
+print(ylist)
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection = '3d')
 ax.scatter(xlist,zlist,ylist)
