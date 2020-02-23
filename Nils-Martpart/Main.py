@@ -21,17 +21,19 @@ sys.path.clear()
 sys.path.append(os.path.realpath('..\\svvproject'))
 sys.path.append(os.path.realpath('..\\Nils-Martpart'))
 from Mart_function_definitions import normal_stress_x_bending_function, redundant_shear_flow, shear_centre, normal_stress_x_bending_function, von_mises_stress_function
-from definitions_max_stress_deflections import relation_shear_1_and_2_torque_and_torque, alternative_q_base_top1, alternative_q_base_spar, alternative_q_base_bottom1, alternative_q_base_sparA, alternative_q_base_top2, alternative_q_base_bottom2, alternative_q_base_sparB
+from definitions_max_stress_deflections import relation_shear_1_and_2_torque_and_torque, alternative_q_base_top1, alternative_q_base_spar, alternative_q_base_bottom1, alternative_q_base_sparA, alternative_q_base_top2, alternative_q_base_bottom2, alternative_q_base_sparB, deflection_z_bending_stress, deflection_y_bending_stress, rate_twist_at_x, twist, deflection_due_to_torque_and_bending
 
 "--------------------------------------------------------------------------------------------------------------------------"
 "This section gives all the dummy inputs to check whether our model can handle the inputs"
 
 number_of_sections = 100
+aileron_length = 10
 moment_about_y_x_direction = number_of_sections*[100]
 moment_about_z_x_direction = number_of_sections*[300]
 shear_force_y_x_direction = number_of_sections*[30]
 shear_force_z_x_direction = number_of_sections*[10]
 torque_x_direction = number_of_sections*[15]
+spanwise_locations = range(0, aileron_length, number_of_sections)
 moment_of_inertia_y = 1000
 moment_of_inertia_z = 500
 centroid_y = 0.0
@@ -45,6 +47,10 @@ aileron_radius = aileron_height/2
 aileron_angle_radians = 1/5*math.pi
 area_circular_section = 0.5*math.pi*aileron_radius**2
 area_triangular_section = 0.5*aileron_height*(chord_length-aileron_height/2)
+x_location_hinge1 = 2
+x_location_hinge3 = 8
+deflection_hinge_1 = 0.1
+deflection_hinge_3 = 0.15
 
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the shear flow due to torsion. It is the same in every cross-section, so it gives outputs only as fixed values per thingey"
@@ -77,6 +83,8 @@ maximum_stress_s4 = []
 location_maximum_stress_s4 = []
 maximum_stress_s5 = []
 location_maximum_stress_s5 = []
+
+rate_of_twist_x_list = []
 
 for j in range(0, len(shear_force_y_x_direction)-1):
     shear_force_y = shear_force_y_x_direction[j]
@@ -247,7 +255,7 @@ for j in range(0, len(shear_force_y_x_direction)-1):
     maximum_stress_stored_s5 = 0
     for i in range(len(s5_list)):
         bending_stress = normal_stress_x_bending_function(moment_about_z_x_direction[j], moment_of_inertia_y, s5_y_list[i]-centroid_y, moment_about_y_x_direction[j], moment_of_inertia_z, s5_z_list[i]-centroid_z)
-        shear_stress = q_total_list_s5[i]*skin_thickness
+        shear_stress = q_total_list_s5[i]*spar_thickness
         von_mises_stress = von_mises_stress_function(bending_stress, shear_stress)
         if von_mises_stress > maximum_stress_stored_s5:
             maximum_stress_stored_s5 = von_mises_stress
@@ -263,9 +271,12 @@ for j in range(0, len(shear_force_y_x_direction)-1):
     maximum_stress_s4.append(maximum_stress_stored_s4)
     location_maximum_stress_s4.append(location_maximum_stress_s4)
     maximum_stress_s5.append(maximum_stress_stored_s5)
-    location_maximum_stress_s5.append(location_maximum_stress_s5)    
+    location_maximum_stress_s5.append(location_maximum_stress_s5) 
+    
+    rate_of_twist_x = rate_twist_at_x(shear_flow_torque_circular_part_list[j], shear_flow_torque_triangular_part_list[j], redundant_shear_flow_circular_section, redundant_shear_flow_triangular_section, aileron_height, spar_thickness, skin_thickness)
+    rate_of_twist_x_list.append(rate_of_twist_x)
 "--------------------------------------------------------------------------------------------------------------------------"
-"This part will handle the computation of shear centre and following that the deflection due to torque"
+"This part will handle the computation of shear centre"
 q_total_top1 = q_total_list_top_1[1]
 q_total_bottom1 = q_total_list_bottom_1[1]
 q_total_top2 = q_total_list_top_2[1]
@@ -277,8 +288,10 @@ shear_centre_location_wrt_spar = shear_centre(q_total_top1, q_total_bottom1, q_t
 print(shear_centre_location_wrt_spar)
 
 "--------------------------------------------------------------------------------------------------------------------------"
-"This part will cover the bending equations and deflection due to bending"
+"This part will cover the bending equations and deflection due to bending and torque"
 
+integral_values2_z = deflection_z_bending_stress(moment_about_y_x_direction, spanwise_locations, moment_of_inertia_y, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
+integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)   
 
-    
-
+twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)
+deflection_z, deflection_y = deflection_due_to_torque_and_bending(twist, 0, shear_centre_location_wrt_spar, integral_values2_y, integral_values2_z)
