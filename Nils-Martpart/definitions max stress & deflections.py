@@ -43,7 +43,7 @@ def alternative_q_base_top1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
         extra=0
         for u in range(len(boom_y_list)):
             y=math.sqrt(1/(1+(np.arctan(s_1_values[i]/radius))**2))*radius*(np.arctan(s_1_values[i]/radius))
-            if y>=boom_list[u][1]:
+            if y>=boom_list[u][2]:
                 extra+=boom_list[u][0]
         integral_value1+=(s_1_values[i]-s_1_values[i-1])*y_values[i-1]+(y_values[i]-y_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values1.append(integral_value1+extra)
@@ -66,8 +66,8 @@ def alternative_q_base_top1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
         extra=0
         for u in range(len(boom_y_list)):
             z=math.sqrt(1/(1+(np.arctan(s_1_values[i]/radius))**2))*radius
-            if z<=boom_list[u][1]:
-                extra+=boom_list[u][0]
+            if z<=boom_list[u][2]:
+                extra+=boom_list[u][1]
         integral_value2+=(s_1_values[i]-s_1_values[i-1])*z_values[i-1]+(z_values[i]-z_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values2.append(integral_value2)
         i+=1  
@@ -102,7 +102,7 @@ def alternative_q_base_bottom1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_
         extra=0
         for u in range(len(boom_y_list)):
             y=math.sqrt(1/(1+(np.arctan(s_1_values[i]/radius))**2))*radius*(np.arctan(s_1_values[i]/radius))
-            if y>=boom_list[u][1]:
+            if y>=boom_list[u][2]:
                 extra+=boom_list[u][0]
         integral_value1+=(s_1_values[i]-s_1_values[i-1])*y_values[i-1]+(y_values[i]-y_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values1.append(integral_value1)
@@ -125,8 +125,8 @@ def alternative_q_base_bottom1(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_
         extra=0
         for u in range(len(boom_y_list)):
             z=math.sqrt(1/(1+(np.arctan(s_1_values[i]/radius))**2))*radius
-            if z>=boom_list[u][1]:
-                extra+=boom_list[u][0]
+            if z>=boom_list[u][2]:
+                extra+=boom_list[u][1]
         integral_value2+=(s_1_values[i]-s_1_values[i-1])*z_values[i-1]+(z_values[i]-z_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values2.append(integral_value2)
         i+=1  
@@ -162,7 +162,7 @@ def alternative_q_base_top2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
         extra=0
         for u in range(len(boom_y_list)):
         y=aileron_height*0.5-s_1_values[i]*np.sin(theta)
-            if y<=boom_list[u][1]:
+            if y<=boom_list[u][2]:
                 extra+=boom_list[u][0]
         integral_value1+=(s_1_values[i]-s_1_values[i-1])*y_values[i-1]+(y_values[i]-y_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values1.append(integral_value1+extra)
@@ -185,8 +185,8 @@ def alternative_q_base_top2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_pri
         extra=0
         for u in range(len(boom_y_list)):
         z=-1*s_1_values[i]*np.cos(theta)
-            if z<=boom_list[u][1]:
-                extra+=boom_list[u][0]
+            if z<=boom_list[u][2]:
+                extra+=boom_list[u][1]
         integral_value2+=(s_1_values[i]-s_1_values[i-1])*z_values[i-1]+(z_values[i]-z_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values2.append(integral_value2+extra)
         i+=1  
@@ -221,7 +221,7 @@ def alternative_q_base_bottom2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_
         extra=0
         for u in range(len(boom_y_list)):
         y=s_1_values[i]*np.sin(theta)
-            if y<=boom_list[u][1]:
+            if y<=boom_list[u][2]:
                 extra+=boom_list[u][0]
         integral_value1+=(s_1_values[i]-s_1_values[i-1])*y_values[i-1]+(y_values[i]-y_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values1.append(integral_value1+extra)
@@ -244,8 +244,8 @@ def alternative_q_base_bottom2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_
         extra=0
         for u in range(len(boom_y_list)):
         z=chord_length-aileron_height*0.5-s_1_values[i]*np.cos(theta)
-            if z>=boom_list[u][1]:
-                extra+=boom_list[u][0]
+            if z>=boom_list[u][2]:
+                extra+=boom_list[u][1]
         integral_value2+=(s_1_values[i]-s_1_values[i-1])*z_values[i-1]+(z_values[i]-z_values[i-1])*(s_1_values[i]-s_1_values[i-1])
         integral_values2.append(integral_value2+extra)
         i+=1  
@@ -495,7 +495,7 @@ def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to st
     twist=0
     i=1
     while i<=len(x_set_of_positions)-1:
-        twist+=(x_set_of_positions[i]-x_set_of_positions[i-1])*rate_twist_at_x #calculates the twist at each point
+        twist+=(x_set_of_positions[i]-x_set_of_positions[i-1])*rate_twist_at_x[i] #calculates the twist at each point
         x_set_of_twist.append(twist)
         i+=1
     return twist, x_set_of_twist #the first output is the twist at the edge of the aileron
