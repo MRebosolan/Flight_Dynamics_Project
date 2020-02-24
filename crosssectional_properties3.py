@@ -41,40 +41,40 @@ A_st=(hst-tst)*tst+tst*wst
 z_stringer=[] 
 y_stringer=[]
 stringer_array=[]
-for n in range(0,100000):
+for n in range(0,1000000):
     z=-R*m.cos(n*b/(R))
     y=R*m.sin(n*b/(R))
     if n>3:
         last_room=0.5*m.pi*R-2*b
         z1=0
-        z2=(n-2)*(Ca-R)/100000
+        z2=(n-2)*(Ca-R)/1000000
         y1=R
         y2=-R/(Ca-R)*z2+R
         l_p=m.sqrt((z1-z2)**2+(y1-y2)**2)
         z=z2
         y=y2
         for i in range (0,10):
-            if abs(l_p-(i*b-last_room))<0.000002:
+            if abs(l_p-(i*b-last_room))<0.00000002:
                 z_stringer.append(z)
                 z_stringer.append(z)
                 y_stringer.append(y)
                 y_stringer.append(-y)
-                stringer_array.append([A_st,z,y])
-                stringer_array.append([A_st,z,-y])
+                stringer_array.append([z+R,y])
+                stringer_array.append([z+R,-y])
             elif z>(Ca-R):
                 break
     elif n<3:
         z_stringer.append(z)
         y_stringer.append(y)
-        stringer_array.append([A_st,z,y])      
+        stringer_array.append([z+R,y])      
         if n>0:
             z_stringer.append(z)
             y_stringer.append(-y)
-            stringer_array.append([A_st,z,-y])
-            
+            stringer_array.append([z+R,-y])
+print(stringer_array)            
 "airfoil placement"
-for i in range(0,r):
-    z=-R+R*i/(r-1)
+for i in range(0,101):
+    z=-R+R*i/(101)
     y=np.sqrt(R**2-z**2)
     z_coordinates.append(z)
     y_coordinates.append(y)
@@ -91,18 +91,21 @@ for i in range(0,101):
     z_coordinates.append(z)
     y_coordinates.append(-y)
 
+
 for i in range(0,101):
     z=-R+R*(100-i)/100
     y=np.sqrt(R**2-z**2)
     z_coordinates.append(z)
     y_coordinates.append(-y)
+    
    
 
 "airfoil plot"
-plt.plot(z_coordinates,y_coordinates)
+plt.plot(z_coordinates,y_coordinates, color='black')
 plt.xlim(-0.2,0.6)
 plt.ylim(-0.2,0.3)
-plt.scatter(z_stringer,y_stringer, s=50)
+plt.scatter(z_stringer,y_stringer, s=30, color='red')
+plt.scatter(zc, yc, marker='x', color='orange')
 
 "Calculation Centroid"
 A_sk1=m.pi*R*tsk
