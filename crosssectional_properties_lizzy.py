@@ -32,7 +32,7 @@ Ab=wst*tst+(hst-tst)*tst #m
 l=2*m.sqrt((Ca-R)**2+(R)**2)+m.pi*R
 b=l/17
 k=b/R #radians
-r=10000
+
 z_coordinates=[]
 y_coordinates=[]
 A_st=(hst-tst)*tst+tst*wst
@@ -85,11 +85,11 @@ for i in range(0,101):
     z_coordinates.append(z)
     y_coordinates.append(y)
 
-for i in range(101,0):
-    z=i*(Ca-R)/100
-    y=-R/(Ca-R)*z+R
-    z_coordinates.append(z)
-    y_coordinates.append(-y)
+#for i in range(101,0):
+ #   z=i*(Ca-R)/100
+  #  y=-R/(Ca-R)*z+R
+   # z_coordinates.append(z)
+    #y_coordinates.append(-y)
 
 #for i in range(0,101):
  #   z=-R+R*i/100
@@ -100,7 +100,7 @@ for i in range(101,0):
 plt.plot(z_coordinates,y_coordinates,)
 plt.xlim(-0.2,0.6)
 plt.ylim(-0.2,0.3)
-plt.plot(z_stringer,y_stringer, marker="x")
+plt.scatter(z_stringer,y_stringer, marker="x")
 
 "Calculation Centroid"
 A_sk1=m.pi*R*tsk
@@ -116,7 +116,7 @@ Az_sk2=A_sk2*1/2*(Ca-R)
 zc=(Az_st+Az_sk1+2*Az_sk2)/A_tot
 yc=0                            #due to symmetry
 #recalculated again due to big difference with verification model
-print(zc)
+print("centroid",zc)
 "Moment of Inertia results"
 #Calculate moment of inertia of straght skin parts
 angle = m.atan(R/(Ca-R))
@@ -166,3 +166,6 @@ Izz_total = 2*Izz_straight + Izz_arc + Izz_spar + Izz_st
 
 print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
+
+"Torsional constant calculation"
+
