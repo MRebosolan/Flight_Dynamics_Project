@@ -294,4 +294,4 @@ integral_values2_z = deflection_z_bending_stress(moment_about_y_x_direction, spa
 integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)   
 
 twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)
-deflection_z, deflection_y = deflection_due_to_torque_and_bending(twist, 0, shear_centre_location_wrt_spar, integral_values2_y, integral_values2_z)
+deflections_list = deflection_due_to_torque_and_bending(twist_list, spanwise_locations 0, shear_centre_location_wrt_spar, integral_values2_y, integral_values2_z)
