@@ -501,14 +501,17 @@ def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to st
     return twist, x_set_of_twist #the first output is the twist at the edge of the aileron
         
     
-def deflection_due_to_torque_and_bending(twist, shear_center_y, shear_center_z, deflection_y_bending, deflection_z_bending):
-    distance=math.sqrt(shear_center_y**2+shear_center_z**2)
-    delta_deflec_y_torque=np.sin(twist)*distance
-    delta_deflec_z_torque=distance*(1-np.cos(twist))
-    deflection_y=delta_deflec_y_torque+deflection_y_bending
-    deflection_z=delta_deflec_z_torque+deflection_z_bending
-    return deflection_z, deflection_y
-
+def deflection_due_to_torque_and_bending(x_set_of_twist, x_set_of_positions, shear_center_y, shear_center_z, deflection_y_bending_set, deflection_z_bending_set):
+    lst_Deflections=[]
+    for i in range(len(x_set_of_twist)):
+        distance=math.sqrt(shear_center_y**2+shear_center_z**2)
+        delta_deflec_y_torque=np.sin(x_set_of_twist[i])*distance
+        delta_deflec_z_torque=distance*(1-np.cos(x_set_of_twist[i]))
+        deflection_y=delta_deflec_y_torque+deflection_y_bending_set[i]
+        deflection_z=delta_deflec_z_torque+deflection_z_bending_set[i]
+        lst_Deflections.append([x_set_of_positions[i], deflection_y, deflection_z])
+        
+    return lst_Deflections
 
 
 
