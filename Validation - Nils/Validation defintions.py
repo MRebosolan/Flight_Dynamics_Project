@@ -56,6 +56,7 @@ def max_stress_validation(max_stress_actual, max_stress_validation, x_location_a
     return error_max_stress, switch, diff_x
 
 def reading_inputs(file_name):
+    #this is not for Shear Center
     file=open(file_name)
     lst=[]
     for x in file:
@@ -83,6 +84,140 @@ def reading_inputs(file_name):
     
     #lst 4 gives an output list of each line [node number, x, y, z]. The outputs are only the nodes which are on the hinge line
     return lst4
+
+def reading_inputs_shear_center_valida(file_name):
+    #this is for Shear Center
+    file=open(file_name)
+    lst=[]
+    for x in file:
+        a=re.split(' |, |\|n|\n', x)
+        lst.append(a)
+        
+    lst2=[]
+    for i in range(9,6597):
+        lst2.append(lst[i])
+    
+    
+    lst3=[]
+    for k in range(len(lst2)):
+        lst4=[]
+        for i in range(len(lst2[k])):
+            if lst2[k][i]!='':
+                lst4.append(float(lst2[k][i]))
+        lst3.append(lst4)
+    file.close()
+    
+    lst4=[]
+    for i in range(len(lst3)):
+        if lst3[i][1]==0 and lst3[i][3]>0:
+            lst4.append(lst3[i])
+            
+    lst5=[]
+    for i in range(len(lst3)):
+        if lst3[i][1]==0 and lst3[i][3]<0:
+            lst5.append(lst3[i])
+            
+    lst6=[]
+    for i in range(len(lst3)):
+        if lst3[i][1]==0 and lst3[i][3]==0:
+            lst6.append(lst3[i])
+            
+    lst6=sorted(lst6, key = lambda x: x[2]) 
+    lst5=sorted(lst5, key = lambda x: x[2]) 
+
+    return lst4, lst5, lst6
+
+def reading_shear_values(file_name, interest_nodes1, interest_nodes2, interest_nodes3):
+    file=open(file_name)
+    lst=[]
+    for x in file:
+        a=re.split(' |, |\|n|\n', x)
+        lst.append(a)
+
+    lst2=[]
+    for i in range(20,5798):
+        lst2.append(lst[i])
+    
+    
+    lst3=[]
+    for k in range(len(lst2)):
+        lst4=[]
+        for i in range(len(lst2[k])):
+            if lst2[k][i]!='':
+                lst4.append(float(lst2[k][i]))
+        lst3.append(lst4)
+    file.close()
+    
+    lst4=[]
+    for i in range(len(lst3)):
+        for j in range(len(interest_nodes1)):
+            if lst3[i][0]==interest_nodes1[j][0]:
+                lst4.append([lst3[i][0], 10**-6*(1.1*lst3[i][4]+1.1*lst3[i][5])/2])
+    lst5=[]
+    for i in range(len(lst3)):
+        for j in range(len(interest_nodes2)):
+            if lst3[i][0]==interest_nodes2[j][0]:
+                lst5.append([lst3[i][0], 10**-6*(1.1*lst3[i][4]+1.1*lst3[i][5])/2])
+                
+    lst6=[]
+    for i in range(len(lst3)):
+        for j in range(len(interest_nodes3)):
+            if lst3[i][0]==interest_nodes3[j][0]:
+                lst6.append([lst3[i][0], 10**-6*(1.1*lst3[i][4]+1.1*lst3[i][5])/2])
+    return lst4, lst5, lst6
+
+def calculating_shear_center_valida(interest_nodes_z_positive, interest_nodes_z_negative, int_nodes_z_neutral, aileron_height_B737, shear_values_B737_z_positive, shear_values_B737_z_negative, B_737_spar_shear, chord_length_B737):
+
+    radius=aileron_height_B737*0.5
+    i=1
+    moment_sum=0
+    while i<=len(interest_nodes_z_positive)-1:
+        shear_value=shear_values_B737_z_positive[i-1][1]*abs(np.arctan(interest_nodes_z_positive[i][2]/interest_nodes_z_positive[i][3])-np.arctan(interest_nodes_z_positive[i-1][2]/interest_nodes_z_positive[i-1][3]) )*radius
+        moment_sum+=aileron_height_B737*0.5*shear_value
+        i+=1
+    
+    angle=np.arcsin(aileron_height_B737*0.5/(math.sqrt(chord_length_B737**2+aileron_height_B737**2*0.25)))
+    
+    i=1
+    while i<=len(interest_nodes_z_negative)-1:
+        shear_value=shear_values_B737_z_negative[i-1][1]*abs(math.sqrt(interest_nodes_z_negative[i][2]**2+interest_nodes_z_negative[i][3]**2)-math.sqrt(interest_nodes_z_negative[i-1][2]**2+interest_nodes_z_negative[i-1][3]**2))
+        if interest_nodes_z_negative[i][2]>0:
+            moment_sum+=(interest_nodes_z_negative[i][2]*shear_value*np.cos(angle)-interest_nodes_z_negative[i][3]*shear_value*np.sin(angle))
+        elif interest_nodes_z_negative[i][2]<0:
+            moment_sum+=-1*(interest_nodes_z_negative[i][2]*shear_value*np.cos(angle)+interest_nodes_z_negative[i][3]*shear_value*np.sin(angle))
+          
+        i+=1
+        
+    i=1   
+    sumy=0
+    sums=[]
+    while i<=len(interest_nodes_z_positive)-1:
+        shear_value=shear_values_B737_z_positive[i-1][1]*abs(np.arctan(interest_nodes_z_positive[i][2]/interest_nodes_z_positive[i][3])-np.arctan(interest_nodes_z_positive[i-1][2]/interest_nodes_z_positive[i-1][3]) )*radius
+        sumy+=shear_value*np.sin(np.pi*0.5-abs(np.arctan(interest_nodes_z_positive[i][2]/interest_nodes_z_positive[i][3])))
+        sums.append(sumy)
+        i+=1
+    sums2=[]
+    i=1
+    while i<=len(interest_nodes_z_negative)-1:
+        shear_value=shear_values_B737_z_negative[i-1][1]*abs(math.sqrt(interest_nodes_z_negative[i][2]**2+interest_nodes_z_negative[i][3]**2)-math.sqrt(interest_nodes_z_negative[i-1][2]**2+interest_nodes_z_negative[i-1][3]**2))
+        sumy+=-1*shear_value*np.sin(np.arcsin(aileron_height_B737*0.5/(math.sqrt(chord_length_B737**2+aileron_height_B737**2*0.25))))
+        sums2.append(sumy)
+        i+=1
+    
+    sum3=[]
+    i=1
+    while i<=len(int_nodes_z_neutral)-1:
+        shear_value=B_737_spar_shear[i-1][1]*(abs(int_nodes_z_neutral[i][2]-int_nodes_z_neutral[i-1][2]))
+        sumy+=-1*shear_value
+        sum3.append(sumy)
+        i+=1
+    
+    V_y=sumy
+    
+    z_pos_S_C= moment_sum/V_y
+    
+    return z_pos_S_C, V_y, moment_sum,sums,sums2,sum3
+
 
 def reading_outputs_deflections_bent(file_name, interest_nodes):
     
@@ -192,6 +327,20 @@ def computing_outputs_twist(deflections_y_and_z_hinge_lines, shear_center_y, she
         twist=np.arctan((deflections_y_and_z_hinge_lines[i][3]-shear_center_y)/(shear_center_z-deflections_y_and_z_hinge_lines[i][4]))
         lst_final_values.append([deflections_y_and_z_hinge_lines[i][0],deflections_y_and_z_hinge_lines[i][1], deflections_y_and_z_hinge_lines[i][2], deflections_y_and_z_hinge_lines[i][3], deflections_y_and_z_hinge_lines[i][4], twist])
     return lst_final_values    
+
+
+
+
+
+
+lst1, lst2, lst3 = reading_inputs_shear_center_valida("B737(1).INP")
+print(len(lst3))
+lst4, lst5, lst6 =reading_shear_values("B737(2).RPT", lst1, lst2, lst3)
+print(len(lst6[0]))
+Z=calculating_shear_center_valida(lst1, lst2,lst3, 205, lst4, lst5, lst6, 605)
+print(Z)
+
+
 
 
 
