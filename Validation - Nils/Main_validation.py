@@ -38,8 +38,9 @@ min_stress=(178.435*10**(-6)+155.774*10**(-6))/2
 min_stress_node= 6519
 
 #NUMERICAL DATA
-twists_value=[] #[twist] twist values at each x, x is not specified but is done from 0 to span
+twists_values=[] #[twist] twist values at each x, x is not specified but is done from 0 to span
 deflection_values=[] # [x location, y deflection, z deflection]
+x_values=[]
 
 max_stress=
 max_stress_node=
@@ -50,8 +51,12 @@ min_stress_node=
 
 
 #Adjusting so that the numerical set of twist and deflections have the same number of points along the span
+new_x_set=creating_format_x(100, span)
+len_twists=len(twists_values)
 
-
+i=0
+while i<=len(new_x_set):
+    
 
 #Engaging in the comparison
 

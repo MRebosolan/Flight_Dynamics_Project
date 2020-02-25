@@ -26,31 +26,33 @@ from definitions_max_stress_deflections import relation_shear_1_and_2_torque_and
 "--------------------------------------------------------------------------------------------------------------------------"
 "This section gives all the dummy inputs to check whether our model can handle the inputs"
 
-number_of_sections = 100
-aileron_length = 10
-moment_about_y_x_direction = number_of_sections*[100]
-moment_about_z_x_direction = number_of_sections*[300]
-shear_force_y_x_direction = number_of_sections*[30]
-shear_force_z_x_direction = number_of_sections*[10]
-torque_x_direction = number_of_sections*[15]
-spanwise_locations = range(0, aileron_length, number_of_sections)
+number_of_sections = 277
+aileron_length = 2.771
+moment_about_y_x_direction = (number_of_sections+1)*[100] #list
+moment_about_z_x_direction = (number_of_sections+1)*[300] #list
+shear_force_y_x_direction = (number_of_sections+1)*[30] #list
+shear_force_z_x_direction = (number_of_sections+1)*[10] #list
+torque_x_direction = (number_of_sections+1)*[15] #list
+spanwise_locations = np.arange(0, aileron_length , round(aileron_length/number_of_sections,2))
+print(len(spanwise_locations))
 moment_of_inertia_y = 1000
 moment_of_inertia_z = 500
 centroid_y = 0.0
 centroid_z = 0.4
-aileron_height = 1
-skin_thickness = 0.001
-spar_thickness = 0.005
-chord_length = 5
+aileron_height = 0.225
+skin_thickness = 0.0011
+spar_thickness = 0.0029
+chord_length = 0.547
 integral_step = 0.01
 aileron_radius = aileron_height/2
 aileron_angle_radians = 1/5*math.pi
 area_circular_section = 0.5*math.pi*aileron_radius**2
 area_triangular_section = 0.5*aileron_height*(chord_length-aileron_height/2)
-x_location_hinge1 = 2
-x_location_hinge3 = 8
-deflection_hinge_1 = 0.1
-deflection_hinge_3 = 0.15
+x_location_hinge1 = 0.153
+x_location_hinge3 = 2.681
+deflection_hinge_1 = 0.01103
+deflection_hinge_3 = 0.01642
+boom_list=[[4.199999999999999e-05, 0.0, -0.1125], [4.199999999999999e-05, 0.06845563484361286, -0.08927528245913276], [4.199999999999999e-05, -0.06845563484361286, -0.08927528245913276], [4.199999999999999e-05, 0.10864704242813845, -0.029190241033918884], [4.199999999999999e-05, -0.10864704242813845, -0.029190241033918884], [4.199999999999999e-05, 0.101454975, 0.04265834100000001], [4.199999999999999e-05, -0.101454975, 0.04265834100000001], [4.199999999999999e-05, 0.083008575, 0.11390243700000002], [4.199999999999999e-05, -0.083008575, 0.11390243700000002], [4.199999999999999e-05, 0.06456228750000001, 0.18514609850000002], [4.199999999999999e-05, -0.06456228750000001, 0.18514609850000002], [4.199999999999999e-05, 0.046115887499999994, 0.25639019450000006], [4.199999999999999e-05, -0.046115887499999994, 0.25639019450000006], [4.199999999999999e-05, 0.027669487500000006, 0.32763429050000004], [4.199999999999999e-05, -0.027669487500000006, 0.32763429050000004], [4.199999999999999e-05, 0.0092232, 0.39887795200000004], [4.199999999999999e-05, -0.0092232, 0.39887795200000004]]
 
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the shear flow due to torsion. It is the same in every cross-section, so it gives outputs only as fixed values per thingey"
@@ -85,34 +87,37 @@ maximum_stress_s5 = []
 location_maximum_stress_s5 = []
 
 rate_of_twist_x_list = []
-
-for j in range(0, len(shear_force_y_x_direction)-1):
+switch=0
+for j in range(0, len(shear_force_y_x_direction)):
+    if j/10==int(j/10):
+        switch+=1
+        print(switch)
     shear_force_y = shear_force_y_x_direction[j]
     shear_force_z = shear_force_z_x_direction[j]
     
     z_pos = 0
     y_pos = aileron_height/2
-    q_base_list_top_1, s1_list  = alternative_q_base_top1(shear_force_y, shear_force_z, moment_of_inertia_y, moment_of_inertia_z, integral_step, aileron_height, skin_thickness, z_pos, y_pos)
-    
+    q_base_list_top_1, s1_list  = alternative_q_base_top1(shear_force_y, shear_force_z, moment_of_inertia_y, moment_of_inertia_z, integral_step, aileron_height, skin_thickness, z_pos, y_pos, boom_list)
+
     z_pos = 0
     y_pos = -aileron_height/2
     q_base_list_spar_area_1, s5_list = alternative_q_base_spar(shear_force_y, shear_force_z, moment_of_inertia_y, moment_of_inertia_z, chord_length, integral_step, aileron_height, skin_thickness, y_pos)
     
     z_pos = -aileron_height/2
     y_pos = 0
-    q_base_list_bottom_1, s3_list = alternative_q_base_bottom1(shear_force_y, shear_force_z, moment_of_inertia_y, moment_of_inertia_z, integral_step, aileron_height, skin_thickness, z_pos, y_pos)
+    q_base_list_bottom_1, s3_list = alternative_q_base_bottom1(shear_force_y, shear_force_z, moment_of_inertia_y, moment_of_inertia_z, integral_step, aileron_height, skin_thickness, z_pos, y_pos, boom_list)
     
     z_pos = 0
     y_pos = aileron_height/2
     q_base_list_spar_area_2_A, sA_list = alternative_q_base_sparA(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness, y_pos)
-    
+
     z_pos = chord_length-aileron_height/2
     y_pos = 0
-    q_base_list_top_2, s2_list = alternative_q_base_top2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness, z_pos, y_pos)
+    q_base_list_top_2, s2_list = alternative_q_base_top2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness, z_pos, y_pos, boom_list)
     
     z_pos = 0
     y_pos = -aileron_height/2
-    q_base_list_bottom_2, s4_list = alternative_q_base_bottom2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness, z_pos, y_pos)
+    q_base_list_bottom_2, s4_list = alternative_q_base_bottom2(shear_force_y, shear_force_z, MOI_y_prime, MOI_z_prime, chord_length, integral_step, aileron_height, skin_thickness, z_pos, y_pos, boom_list)
     
     z_pos = 0
     y_pos = 0
@@ -120,62 +125,70 @@ for j in range(0, len(shear_force_y_x_direction)-1):
 
     "The upcoming part adds the base flows of the previous parts to the current part"
     
-    for i in range(0, len(q_base_list_spar_area_1)-1):
+    
+    for i in range(0, len(q_base_list_spar_area_1)):
         q_base_list_spar_area_1[i] = q_base_list_spar_area_1[i]+q_base_list_top_1[-1]
     
-    for i in range(0, len(q_base_list_bottom_1)-1):
+    for i in range(0, len(q_base_list_bottom_1)):
         q_base_list_bottom_1[i] = q_base_list_bottom_1[i]+q_base_list_spar_area_1[-1]
         
-    for i in range(0, len(q_base_list_top_2)-1):
+    for i in range(0, len(q_base_list_top_2)):
         q_base_list_top_2[i] = q_base_list_top_2[i]+q_base_list_spar_area_2_A[-1]
         
-    for i in range(0, len(q_base_list_bottom_2)-1):
+    for i in range(0, len(q_base_list_bottom_2)):
         q_base_list_bottom_2[i] = q_base_list_bottom_2[i]+q_base_list_top_2[-1]
         
-    for i in range(0, len(q_base_list_spar_area_2_B)-1):
-        q_base_list_spar_area_2_B[i] = q_base_List_spar_area_2_B[i]+q_base_list_bottom_2[-1]
+    for i in range(0, len(q_base_list_spar_area_2_B)):
+        q_base_list_spar_area_2_B[i] = q_base_list_spar_area_2_B[i]+q_base_list_bottom_2[-1]
 
     "The upcoming part adds the shear flows of the spars together to get to one value"
     
     q_base_list_spar_A = []
-    for i in range(0, len(q_base_list_spar_area_2_A)-1):
-        q_base_list_spar_A.append(q_base_list_spar_area_2_A[i]-q_base_list_spar_area_1[-(len(q_base_list_spar_area_1)/2+i)])
+    for i in range(0, len(q_base_list_spar_area_2_A)):
+        index=int(-(len(q_base_list_spar_area_1)/2+i))
+        q_base_list_spar_A.append(q_base_list_spar_area_2_A[i]-q_base_list_spar_area_1[index])
         
     q_base_list_spar_B = []
-    for i in range(0, len(q_base_list_spar_area_2_B)-1):
+    for i in range(0, len(q_base_list_spar_area_2_B)):
         q_base_list_spar_B.append(q_base_list_spar_area_2_B[i]+q_base_list_spar_area_1[-i])
         
         "The upcoming part calculates the redundant shear flows for the sections"
-
+    s1_list=s1_list[:-1]
+    s2_list=s2_list[:-1]
+    s3_list=s3_list[:-1]
+    s4_list=s4_list[:-1]
+    sA_list=sA_list[:-1]
+    sB_list=sB_list[:-1]
     redundant_shear_flow_circular_section, redundant_shear_flow_triangular_section = redundant_shear_flow(q_base_list_top_1, s1_list, q_base_list_bottom_2, s4_list, aileron_radius, aileron_angle_radians, aileron_height, area_circular_section, area_triangular_section, ratio_between_redundant_shear_flows)
 
     "The upcoming part adds the redundant, base and torque shear flows"    
     q_total_list_top_1 = []    
-    for i in range(0, len(q_base_list_top_1)-1):
+    for i in range(0, len(q_base_list_top_1)):
         q_total_list_top_1.append(q_base_list_top_1[i]+redundant_shear_flow_circular_section+shear_flow_torque_circular_part_list[j])
         
     q_total_list_top_2 = []
-    for i in range(0, len(q_base_list_top_2)-1):
+    for i in range(0, len(q_base_list_top_2)):
         q_total_list_top_2.append(q_base_list_top_2[i]+redundant_shear_flow_triangular_section+shear_flow_torque_triangular_part_list[j])
         
     q_total_list_bottom_1 = []
-    for i in range(0, len(q_base_list_bottom_1)-1):
+    for i in range(0, len(q_base_list_bottom_1)):
         q_total_list_bottom_1.append(q_base_list_bottom_1[i]+redundant_shear_flow_circular_section+shear_flow_torque_circular_part_list[j])
         
     q_total_list_bottom_2 = []
-    for i in range(0, len(q_base_list_bottom_2)-1):
+    for i in range(0, len(q_base_list_bottom_2)):
         q_total_list_bottom_2.append(q_base_list_bottom_2[i]+redundant_shear_flow_triangular_section+shear_flow_torque_triangular_part_list[j])
         
     q_total_list_spar_A = []
-    for i in range(0, len(q_base_list_spar_A)-1):
+    for i in range(0, len(q_base_list_spar_A)):
         q_total_list_spar_A.append(q_base_list_spar_A[i]-redundant_shear_flow_circular_section+redundant_shear_flow_triangular_section-shear_flow_torque_circular_part_list[j]+shear_flow_torque_triangular_part_list[j])
         
     q_total_list_spar_B = []
-    for i in range(0, len(q_base_list_spar_B)-1):
+    for i in range(0, len(q_base_list_spar_B)):
         q_total_list_spar_B.append(q_base_list_spar_B[i]-redundant_shear_flow_circular_section+redundant_shear_flow_triangular_section-shear_flow_torque_circular_part_list[j]+shear_flow_torque_triangular_part_list[j])
 
     q_total_list_spar = q_total_list_spar_B+q_total_list_spar_A
     s5_list = [sB_list + sA_list]
+
 
     "This part will define geometry for all of the 5 parts, creating a z-list and y-list next to the already existing s-lists."
     "s1 is the top circular part"
@@ -187,91 +200,91 @@ for j in range(0, len(shear_force_y_x_direction)-1):
     s1_y_list = []
     s1_z_list = []
     for s1 in s1_list:
-        s1_y_list.append(sin(s1))
-        s1_z_list.append(-cos(s1))
+        s1_y_list.append(np.sin(s1))
+        s1_z_list.append(-np.cos(s1))
         
     s2_y_list = []
     s2_z_list = []
     for s2 in s2_list:
-        s2_y_list.append(aileron_height/2-s2*sin(aileron_angle_radians))
-        s2_z_list.append(s2*cos(aileron_angle_radians))
+        s2_y_list.append(aileron_height/2-s2*np.sin(aileron_angle_radians))
+        s2_z_list.append(s2*np.cos(aileron_angle_radians))
         
     s3_y_list = []
     s3_z_list = []
     for s3 in s3_list:
-        s3_y_list.append(-s3*sin(aileron_angle_radians))
-        s3_z_list.append((chord_length-0.5*aileron_height)-s3*cos(aileron_angle_radians))
+        s3_y_list.append(-s3*np.sin(aileron_angle_radians))
+        s3_z_list.append((chord_length-0.5*aileron_height)-s3*np.cos(aileron_angle_radians))
         
     s4_y_list = []
     s4_z_list = []
     for s4 in s4_list:
-        s4_y_list.append(-aileron_height/2+cos(s4))
-        s4_z_list.append(-sin(s4))
+        s4_y_list.append(-aileron_height/2+np.cos(s4))
+        s4_z_list.append(-np.sin(s4))
         
     s5_y_list = []
     s5_z_list = []
-    for s5 in s5_list:
-        s5_y_list.append(-aileron_height/2+s5)
+    for s5 in s5_list[0]:
+        append=-1*aileron_height/2+s5
+        s5_y_list.append(append)
         s5_z_list.append(0)
         
     "This part will calculate, for every section, the stress throughout. It will return the maximum stress."
-    
     maximum_stress_stored_s1 = 0
     for i in range(len(s1_list)):
         bending_stress = normal_stress_x_bending_function(moment_about_z_x_direction[j], moment_of_inertia_y, s1_y_list[i]-centroid_y, moment_about_y_x_direction[j], moment_of_inertia_z, s1_z_list[i]-centroid_z)
-        shear_stress = q_total_list_s1[i]*skin_thickness
+        shear_stress = q_total_list_top_1[i]*skin_thickness
         von_mises_stress = von_mises_stress_function(bending_stress, shear_stress)
         if von_mises_stress > maximum_stress_stored_s1:
             maximum_stress_stored_s1 = von_mises_stress
-            location_maximum_stress_s1 = s1_list[i]
+            location_maximum_stress_s1_value = s1_list[i]
             
     maximum_stress_stored_s2 = 0
     for i in range(len(s2_list)):
         bending_stress = normal_stress_x_bending_function(moment_about_z_x_direction[j], moment_of_inertia_y, s2_y_list[i]-centroid_y, moment_about_y_x_direction[j], moment_of_inertia_z, s2_z_list[i]-centroid_z)
-        shear_stress = q_total_list_s2[i]*skin_thickness
+        shear_stress = q_total_list_top_2[i]*skin_thickness
         von_mises_stress = von_mises_stress_function(bending_stress, shear_stress)
-        if von_mises_stress > maximum_stress_stored_s1:
+        if von_mises_stress > maximum_stress_stored_s2:
             maximum_stress_stored_s2 = von_mises_stress
-            location_maximum_stress_s2 = s2_list[i]
+            location_maximum_stress_s2_value = s2_list[i]
             
     maximum_stress_stored_s3 = 0
     for i in range(len(s3_list)):
         bending_stress = normal_stress_x_bending_function(moment_about_z_x_direction[j], moment_of_inertia_y, s3_y_list[i]-centroid_y, moment_about_y_x_direction[j], moment_of_inertia_z, s3_z_list[i]-centroid_z)
-        shear_stress = q_total_list_s3[i]*skin_thickness
+        shear_stress = q_total_list_bottom_1[i]*skin_thickness
         von_mises_stress = von_mises_stress_function(bending_stress, shear_stress)
-        if von_mises_stress > maximum_stress_stored_s1:
+        if von_mises_stress > maximum_stress_stored_s3:
             maximum_stress_stored_s3 = von_mises_stress
-            location_maximum_stress_s3 = s3_list[i] 
+            location_maximum_stress_s3_value = s3_list[i] 
             
     maximum_stress_stored_s4 = 0
     for i in range(len(s4_list)):
         bending_stress = normal_stress_x_bending_function(moment_about_z_x_direction[j], moment_of_inertia_y, s4_y_list[i]-centroid_y, moment_about_y_x_direction[j], moment_of_inertia_z, s4_z_list[i]-centroid_z)
-        shear_stress = q_total_list_s4[i]*skin_thickness
+        shear_stress = q_total_list_bottom_2[i]*skin_thickness
         von_mises_stress = von_mises_stress_function(bending_stress, shear_stress)
         if von_mises_stress > maximum_stress_stored_s4:
             maximum_stress_stored_s4 = von_mises_stress
-            location_maximum_stress_s4 = s4_list[i]
+            location_maximum_stress_s4_value = s4_list[i]
             
     maximum_stress_stored_s5 = 0
-    for i in range(len(s5_list)):
+    for i in range(len(s5_list[0])):
         bending_stress = normal_stress_x_bending_function(moment_about_z_x_direction[j], moment_of_inertia_y, s5_y_list[i]-centroid_y, moment_about_y_x_direction[j], moment_of_inertia_z, s5_z_list[i]-centroid_z)
-        shear_stress = q_total_list_s5[i]*spar_thickness
+        shear_stress = q_total_list_spar[i]*spar_thickness
         von_mises_stress = von_mises_stress_function(bending_stress, shear_stress)
         if von_mises_stress > maximum_stress_stored_s5:
             maximum_stress_stored_s5 = von_mises_stress
-            location_maximum_stress_s5 = s5_list[i]     
+            location_maximum_stress_s5_value = s5_list[0][i]     
             
     "This last part will store everything"
     maximum_stress_s1.append(maximum_stress_stored_s1)
-    location_maximum_stress_s1.append(location_maximum_stress_s1)
+    location_maximum_stress_s1.append(location_maximum_stress_s1_value)
     maximum_stress_s2.append(maximum_stress_stored_s2)
-    location_maximum_stress_s2.append(location_maximum_stress_s2)
+    location_maximum_stress_s2.append(location_maximum_stress_s2_value)
     maximum_stress_s3.append(maximum_stress_stored_s3)
-    location_maximum_stress_s3.append(location_maximum_stress_s3)
+    location_maximum_stress_s3.append(location_maximum_stress_s3_value)
     maximum_stress_s4.append(maximum_stress_stored_s4)
-    location_maximum_stress_s4.append(location_maximum_stress_s4)
+    location_maximum_stress_s4.append(location_maximum_stress_s4_value)
     maximum_stress_s5.append(maximum_stress_stored_s5)
-    location_maximum_stress_s5.append(location_maximum_stress_s5) 
+    location_maximum_stress_s5.append(location_maximum_stress_s5_value) 
     
     rate_of_twist_x = rate_twist_at_x(shear_flow_torque_circular_part_list[j], shear_flow_torque_triangular_part_list[j], redundant_shear_flow_circular_section, redundant_shear_flow_triangular_section, aileron_height, spar_thickness, skin_thickness)
     rate_of_twist_x_list.append(rate_of_twist_x)
@@ -283,15 +296,16 @@ q_total_top2 = q_total_list_top_2[1]
 q_total_bottom2 = q_total_list_bottom_2[1]
 
 
-shear_centre_location_wrt_spar = shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height)
+shear_centre_location_wrt_spar = shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians )
 
 print(shear_centre_location_wrt_spar)
 
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will cover the bending equations and deflection due to bending and torque"
 
-integral_values2_z = deflection_z_bending_stress(moment_about_y_x_direction, spanwise_locations, moment_of_inertia_y, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
-integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)   
+integral_values2_z = deflection_z_bending_stress(moment_about_y_x_direction, spanwise_locations, moment_of_inertia_y)
+integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z)   
 
 twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)
-deflection_z, deflection_y = deflection_due_to_torque_and_bending(twist, 0, shear_centre_location_wrt_spar, integral_values2_y, integral_values2_z)
+lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_list, spanwise_locations, 0, shear_centre_location_wrt_spar, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
+

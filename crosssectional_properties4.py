@@ -59,18 +59,18 @@ for n in range(0,1000000):
                 z_stringer.append(z)
                 y_stringer.append(y)
                 y_stringer.append(-y)
-                stringer_array.append([A_st, z,y])
-                stringer_array.append([A_st, z,-y])
+                stringer_array.append([A_st, y,z])
+                stringer_array.append([A_st, -y,z])
             elif z>(Ca-R):
                 break
     elif n<3:
         z_stringer.append(z)
         y_stringer.append(y)
-        stringer_array.append([A_st, z,y])      
+        stringer_array.append([A_st, y,z])      
         if n>0:
             z_stringer.append(z)
             y_stringer.append(-y)
-            stringer_array.append([A_st, z,-y])
+            stringer_array.append([A_st, -y,z])
 
 print(stringer_array)
        
