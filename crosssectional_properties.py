@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Created on Mon Feb 17 12:32:42 2020
 @author: lizzy & richelle
@@ -164,7 +163,6 @@ Izz_total = 2*Izz_straight + Izz_arc + Izz_spar + Izz_st
 
 print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
-=======
 """
 Created on Mon Feb 17 12:32:42 2020
 @author: lizzy & richelle
@@ -328,4 +326,3 @@ Izz_total = Izz_straight + Izz_arc + Izz_spar + Izz_st
 
 print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4")
->>>>>>> 680f4a904c46310945534a6479a9180a6cada429
