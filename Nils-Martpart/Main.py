@@ -89,9 +89,6 @@ location_maximum_stress_s5 = []
 rate_of_twist_x_list = []
 switch=0
 for j in range(0, len(shear_force_y_x_direction)):
-    if j/10==int(j/10):
-        switch+=1
-        print(switch)
     shear_force_y = shear_force_y_x_direction[j]
     shear_force_z = shear_force_z_x_direction[j]
     
@@ -306,6 +303,6 @@ print(shear_centre_location_wrt_spar)
 integral_values2_z = deflection_z_bending_stress(moment_about_y_x_direction, spanwise_locations, moment_of_inertia_y)
 integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z)   
 
-twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)
+twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)[0], twist(spanwise_locations, rate_of_twist_x_list)[1]
 lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_list, spanwise_locations, 0, shear_centre_location_wrt_spar, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
 

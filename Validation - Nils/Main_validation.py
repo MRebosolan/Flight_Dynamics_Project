@@ -40,6 +40,7 @@ min_stress_node= 6519
 #NUMERICAL DATA
 span=
 twists_values=[] #[twist] twist values at each x, x is not specified but is done from 0 to span
+twist_x_nodes=[]
 deflection_values=[] # [x location, y deflection, z deflection]
 x_values=[]
 
@@ -52,22 +53,11 @@ min_stress_node=
 
 
 #Adjusting so that the numerical set of twist and deflections have the same number of points along the span
-new_x_set=creating_format_x(100, span)
+new_x_set=creating_format_x(108, span)
 len_twists=len(twists_values)
 
-    #converting the deflections to a hundred nodes
-i=1
-new_list_deflections=[]
-while i<=len(new_x_set)-1:
-    sum_y=0
-    sum_z=0
-    counter=0
-    for j in range(len(deflection_values)):
-        if new_x_set[i-1]<deflection_values[j][0] and new_x_set[i]>deflection_values[j][0]:
-            sum_y+=deflection_values[j][1]
-            sum_z+=deflection_values[j][2]
-            counter+=1
-    new_list_deflections.append([new_x_set, sum_y/counter, sum_z/counter])
+    #converting the deflections to 108 nodes
+new_deflections_num_model= converting_deflection_list(new_x_set, deflection_values)
     
 
 #Engaging in the comparison
