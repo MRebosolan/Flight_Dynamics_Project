@@ -104,8 +104,6 @@ for i in range(0,101):
     z_coordinates.append(z)
     y_coordinates.append(-y)
 
-
-
 "Calculation Centroid"
 A_sk1=m.pi*R*tsk
 A_sk2=m.sqrt((Ca-R)**2+R**2)*tsk
@@ -114,9 +112,9 @@ A_sp=ha*tsp
 A_tot=A_sk1+2*A_sk2+A_sp+17*A_st
 print("Total area:", A_tot, "m^2")
 
-Az_st=A_st*sum(z_stringer)
-Az_sk1=A_sk1*2*-R/(m.pi)
-Az_sk2=A_sk2*1/2*(Ca-R)
+Az_st=A_st*sum(z_stringer) #m^2
+Az_sk1=A_sk1*2*-R/(m.pi)  #m^2
+Az_sk2=A_sk2*1/2*(Ca-R)   #m^2
 Ay_st=A_st*sum(y_stringer)
 Ay_sk1=A_sk1*0
 Ay_sk2=A_sk2*1/2*(R)
@@ -131,15 +129,11 @@ plt.xlim(-0.2,0.6)
 plt.ylim(-0.2,0.3)
 plt.scatter(z_stringer,y_stringer, s=30, color='red')
 plt.scatter(zc, yc, marker="x", color='orange')
-plt.plot(zsc,ysc, marker="x")
 
 "Moment of Inertia results"
 #Calculate moment of inertia of straght skin parts
-angle = m.atan(R/(Ca-R))
-
-length_beam = m.sqrt(R**2+(Ca-R)**2)
-
-
+angle = m.atan(R/(Ca-R)) #radians
+length_beam = m.sqrt(R**2+(Ca-R)**2) #m
 Iyy_straight = ((tsk*length_beam**(3)*m.cos(angle)*m.cos(angle))/12+A_sk2*((Ca-R)/2-zc)**2) #2 beams
 #print("Moment of inertia of straight skin parts Iyy is:", Iyy_straight, "m^4")
 
