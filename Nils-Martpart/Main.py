@@ -283,7 +283,7 @@ q_total_top2 = q_total_list_top_2[1]
 q_total_bottom2 = q_total_list_bottom_2[1]
 
 
-shear_centre_location_wrt_spar = shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height)
+shear_centre_location_wrt_spar = shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians)
 
 print(shear_centre_location_wrt_spar)
 

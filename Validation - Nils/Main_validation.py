@@ -15,16 +15,12 @@ import Validation_defintions
     #twists are taken about the hinge line
 
 interest_nodes = Validation_defintions.reading_inputs('B737(1).INP')
-print((interest_nodes[0]))
+
 outputs_deflections_bent= Validation_defintions.reading_outputs_deflections_bent('B737(2).RPT', interest_nodes[0])[1]
 outputs_deflections_unbent = Validation_defintions.reading_outputs_deflections_unbent('B737(2).RPT', interest_nodes[0])[1]
 outputs_deflections_pure_bending= Validation_defintions.reading_outputs_deflections_pure_bending('B737(2).RPT', interest_nodes[0])[1]
 
-
-
-
 average_y_z_deflections_due_torque=Validation_defintions.average_y_z_deflections_due_to_torque_validated_data(outputs_deflections_unbent, outputs_deflections_bent, outputs_deflections_pure_bending)
-
 
 shear_center_l_e_z=-0.10856995078063854
 hinge_line_to_l_e_z=0.1025
@@ -42,7 +38,30 @@ min_stress=(178.435*10**(-6)+155.774*10**(-6))/2
 min_stress_node= 6519
 
 #NUMERICAL DATA
-    #reading 
+span=
+twists_values=[] #[twist] twist values at each x, x is not specified but is done from 0 to span
+twist_x_nodes=[]
+deflection_values=[] # [x location, y deflection, z deflection]
+x_values=[]
+
+max_stress=
+max_stress_node=
+max_stress_member=
+
+min_stress=
+min_stress_node=
+
+
+#Adjusting so that the numerical set of twist and deflections have the same number of points along the span
+new_x_set=creating_format_x(108, span)
+len_twists=len(twists_values)
+
+    #converting the deflections to 108 nodes
+new_deflections_num_model= converting_deflection_list(new_x_set, deflection_values)
+    #converting the twist to 108 nodes
+new_twist_num_model= converting_twist_list(new_x_set, twist_values, twist_x_nodes)
+#Engaging in the comparison
+
 
 
 

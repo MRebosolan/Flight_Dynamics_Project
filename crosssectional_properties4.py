@@ -59,18 +59,18 @@ for n in range(0,100000):
                 z_stringer.append(z)
                 y_stringer.append(y)
                 y_stringer.append(-y)
-                stringer_array.append([A_st, z,y])
-                stringer_array.append([A_st, z,-y])
+                stringer_array.append([A_st, y,z])
+                stringer_array.append([A_st, -y,z])
             elif z>(Ca-R):
                 break
     elif n<3:
         z_stringer.append(z)
         y_stringer.append(y)
-        stringer_array.append([A_st, z,y])      
+        stringer_array.append([A_st, y,z])      
         if n>0:
             z_stringer.append(z)
             y_stringer.append(-y)
-            stringer_array.append([A_st, z,-y])
+            stringer_array.append([A_st, -y,z])
 
 
        
@@ -182,3 +182,4 @@ Izz_total = 2*Izz_straight + Izz_arc + Izz_spar + Izz_st
 print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
 
+"Torsional constant calculation"
