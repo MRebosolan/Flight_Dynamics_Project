@@ -58,8 +58,8 @@ len_twists=len(twists_values)
 
     #converting the deflections to 108 nodes
 new_deflections_num_model= converting_deflection_list(new_x_set, deflection_values)
-    
-
+    #converting the twist to 108 nodes
+new_twist_num_model= converting_twist_list(new_x_set, twist_values, twist_x_nodes)
 #Engaging in the comparison
 
 
