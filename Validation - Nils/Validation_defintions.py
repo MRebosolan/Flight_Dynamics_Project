@@ -244,6 +244,45 @@ def creating_format_x(number_of_nodes, span):
 
 print(creating_format_x(10, 1000))
 
+def converting_deflection_list(new_x_set, deflection_values):
+    i=1
+    new_list_deflections=[]
+    while i<=len(new_x_set)-1:
+        sum_y=0
+        sum_z=0
+        counter=0
+        for j in range(len(deflection_values)):
+            if new_x_set[i-1]<deflection_values[j][0] and new_x_set[i]>deflection_values[j][0]:
+                sum_y+=deflection_values[j][1]
+                sum_z+=deflection_values[j][2]
+                counter+=1
+        if counter==0:
+            new_list_deflections.append([new_x_set, 0, 0])
+        else:
+            new_list_deflections.append([new_x_set, sum_y/counter, sum_z/counter])
+        i+=1
+        
+    return new_list_deflections
+
+def converting_twist_list(new_x_set, twist_values, x_values):
+    i=1
+    new_list_twists=[]
+    while i<=len(new_x_set)-1:
+        sum_y=0
+        sum_z=0
+        counter=0
+        for j in range(len(x_values)):
+            if new_x_set[i-1]<x_values[j] and new_x_set[i]>x_values[j][0]:
+                sum_y+=twist_values[j][1]
+                sum_z+=twist_values[j][2]
+                counter+=1
+        if counter==0:
+            new_list_twists.append([new_x_set, 0, 0])
+        else:
+            new_list_twists.append([new_x_set, sum_y/counter, sum_z/counter])
+        i+=1
+        
+    return new_list_twists
 
 
 

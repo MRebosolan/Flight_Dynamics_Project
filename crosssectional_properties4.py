@@ -75,8 +75,8 @@ for n in range(0,1000000):
 print(stringer_array)
        
 "airfoil placement"
-for i in range(0,r):
-    z=-R+R*i/(r-1)
+for i in range(0,101):
+    z=-R+R*i/(100)
     y=np.sqrt(R**2-z**2)
     z_coordinates.append(z)
     y_coordinates.append(y)

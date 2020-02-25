@@ -487,6 +487,7 @@ def rate_twist_at_x(shear_torque_1,shear_torque_2, shear_zero_1,shear_zero_2, ai
 def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to start at zero
     #the x_set_of_positions starts at the origin, that is at hinge 1. thus, hinge 1 is fixed in twist
     x_set_of_twist=[]
+    x_set=[]
     #x_set_of_positions=x_set_of_positions[1:]
     twist=0
     i=1
@@ -497,9 +498,10 @@ def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to st
             twist+=(x_set_of_positions[i]-x_set_of_positions[i-1])*rate_twist_at_x[i] #calculates the twist at each point
 
         x_set_of_twist.append(twist)
+        x_set.append(x_set_of_positions[i])
         i+=1
     x_set_of_twist.insert(0,0)
-    return twist, x_set_of_twist #the first output is the twist at the edge of the aileron
+    return twist, x_set_of_twist, x_set#the first output is the twist at the edge of the aileron
         
     
 def deflection_due_to_torque_and_bending(x_set_of_twist, x_set_of_positions, shear_center_y, shear_center_z, deflection_y_bending_set, deflection_z_bending_set, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3):

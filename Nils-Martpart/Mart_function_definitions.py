@@ -26,7 +26,7 @@ def redundant_shear_flow(q_b_s1, s1, q_b_s4, s4, aileron_radius, aileron_angle_r
     redundant_shear_flow_triangular_section = redundant_shear_flow_circular_section*ratio_between_redundant_shear_flows
     return redundant_shear_flow_circular_section, redundant_shear_flow_circular_section
 
-def shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians):
+def shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians, s1_list, s2_list, s3_list, s4_list):
     moment_q1 = 0
     l = s1_list[1]
     for q in q_total_top1:
