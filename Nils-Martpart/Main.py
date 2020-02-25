@@ -287,13 +287,13 @@ for j in range(0, len(shear_force_y_x_direction)):
     rate_of_twist_x_list.append(rate_of_twist_x)
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the computation of shear centre"
-q_total_top1 = q_total_list_top_1[1]
-q_total_bottom1 = q_total_list_bottom_1[1]
-q_total_top2 = q_total_list_top_2[1]
-q_total_bottom2 = q_total_list_bottom_2[1]
+q_total_top1 = q_total_list_top_1
+q_total_bottom1 = q_total_list_bottom_1
+q_total_top2 = q_total_list_top_2
+q_total_bottom2 = q_total_list_bottom_2
 
 
-shear_centre_location_wrt_spar = shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians )
+shear_centre_location_wrt_spar = -shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians )
 
 print(shear_centre_location_wrt_spar)
 
