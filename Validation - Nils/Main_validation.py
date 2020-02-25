@@ -38,6 +38,7 @@ min_stress=(178.435*10**(-6)+155.774*10**(-6))/2
 min_stress_node= 6519
 
 #NUMERICAL DATA
+span=
 twists_values=[] #[twist] twist values at each x, x is not specified but is done from 0 to span
 deflection_values=[] # [x location, y deflection, z deflection]
 x_values=[]
@@ -54,8 +55,19 @@ min_stress_node=
 new_x_set=creating_format_x(100, span)
 len_twists=len(twists_values)
 
-i=0
-while i<=len(new_x_set):
+    #converting the deflections to a hundred nodes
+i=1
+new_list_deflections=[]
+while i<=len(new_x_set)-1:
+    sum_y=0
+    sum_z=0
+    counter=0
+    for j in range(len(deflection_values)):
+        if new_x_set[i-1]<deflection_values[j][0] and new_x_set[i]>deflection_values[j][0]:
+            sum_y+=deflection_values[j][1]
+            sum_z+=deflection_values[j][2]
+            counter+=1
+    new_list_deflections.append([new_x_set, sum_y/counter, sum_z/counter])
     
 
 #Engaging in the comparison
