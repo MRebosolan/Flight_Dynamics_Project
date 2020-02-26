@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 24 10:43:19 2020
+Created on Wed Feb 26 16:07:50 2020
 
 @author: Nils
 """
-import sys, os
-sys.path.clear()
-sys.path.append(os.path.realpath('..\\svvproject'))
-sys.path.append(os.path.realpath('..\\Validation - Nils'))
-import Validation_definitions
+
 import matplotlib.pyplot as plt
 #VALIDATION DATA
     #reading and computing twists, max_stress and deflections
@@ -155,8 +151,6 @@ else:
     
 
     
-
-
 
 
 

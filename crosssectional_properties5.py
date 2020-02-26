@@ -130,7 +130,7 @@ plt.xlim(-0.2,0.6)
 plt.ylim(-0.2,0.3)
 plt.scatter(z_stringer,y_stringer, s=30, color='red')
 plt.scatter(zc, yc, marker="x", color='orange')
-plt.plot(zsc,ysc, marker="x")
+#plt.plot(zsc,ysc, marker="x")
 
 "Moment of Inertia results"
 #Calculate moment of inertia of straght skin parts
@@ -182,7 +182,4 @@ Izz_total = 2*Izz_straight + Izz_arc + Izz_spar + Izz_st
 print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
 
-<<<<<<< HEAD
-=======
-"Torsional constant calculation"
->>>>>>> 6f76956928ff49ed6e9a695342e8789bac8611a0
+
