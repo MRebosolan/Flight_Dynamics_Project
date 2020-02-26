@@ -450,8 +450,7 @@ def deflection_y_bending_stress(moment_z_set,x_set_of_positions,MOI_z_prime, E_m
         K=integral_values1[i]
         K_list.append(K)
         i+=1
-    
-        
+     
     integral_value2=0
     i=1
     integral_values2=[]
@@ -464,7 +463,6 @@ def deflection_y_bending_stress(moment_z_set,x_set_of_positions,MOI_z_prime, E_m
         integral_values2.append(integral_value2)
         i+=1
     integral_values2.insert(0,0)
-    
     
     return integral_values2
 
@@ -517,14 +515,10 @@ def deflection_due_to_torque_and_bending(x_set_of_twist, x_set_of_positions, she
     D=((-1*deflection_hinge_1+lst_Deflections[index1][1]-lst_Deflections[index3][1]+deflection_hinge_3))/(diff_x3_x1)
     C=(deflection_hinge_1-lst_Deflections[index1][1]-D*round(x_location_hinge1,2))
     
- 
-    
     #using the boundary conditions to find the integration constants, z deflections
     D_z=((lst_Deflections[index1][2]-lst_Deflections[index3][2]))/(diff_x3_x1)
     C_z=(-lst_Deflections[index1][2]-D_z*round(x_location_hinge1,2))
 
-
-    
     #correcting the data using the constants
     i=0
     lst_final_Deflections=[]
