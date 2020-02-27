@@ -189,8 +189,8 @@ print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
 
 "torsional constant"
-J1=4*(0.5*m.pi*R**2)**2/((m.pi*R/tsk))
-J2=4*(R*(Ca-R))**2/((2*m.sqrt(R**2+(Ca-R)**2)/tsk))
+J1=4*(0.5*m.pi*Ra**2)**2/((m.pi*Ra/tsk))
+J2=4*(Ra*(Ca-Ra))**2/((2*m.sqrt(Ra**2+(Ca-Ra)**2)/tsk))
 
 J=J1+J2
 print("Torsional constant", J)
