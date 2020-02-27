@@ -7,7 +7,7 @@ import numpy as np
 import math as m
 import matplotlib.pyplot as plt
 
-aircraft = "A320" # Write either A320, F100, CRJ700 or Do228 (bear in mind capitals); this is used for aerodynamic loading
+aircraft = "A320"
 Ca = 0.547  # m
 la = 2.771  # m
 x1 = 0.153  # m
