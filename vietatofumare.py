@@ -141,17 +141,18 @@ def Sheary(x):
     return numerical_integrator1d(qy,100,x) -1*cos*solution[0]*stepfunction2(x,x1)-1*cos*solution[1]*stepfunction2(x,x2)-1*cos*solution[2]*stepfunction2(x,x3)-1*sin*solution[3]*stepfunction2(x,x1)-1*sin*solution[4]*stepfunction2(x,x2)-1*sin*solution[5]*stepfunction2(x,x3)-1*sin*solution[6]*stepfunction2(x,xI) + P*sin*stepfunction2(x,xp)
 def Torque(x):
     return numerical_integrator1d(torque,100,x)+cos*zsc*stepfunction2(x,x1)*solution[0]+cos*zsc*stepfunction2(x,x2)*solution[1]+cos*zsc*stepfunction2(x,x3)*solution[2]+sin*zsc*stepfunction2(x,x1)*solution[3]+sin*zsc*stepfunction2(x,x2)*solution[4]+sin*zsc*stepfunction2(x,x3)*solution[5]+sin*zsc*stepfunction2(x,xI)*solution[6]+cos*(ha/2)*stepfunction2(x,xI)*solution[6] - P*cos*(ha/2)*stepfunction2(x,xp) - P*sin*zsc*stepfunction2(x,xp)
+xsamp3 = np.linspace(0,-2.76,277)
 y23 = []
 y24 = []
 y25 = []
 y26 = []
 y27 = []
-for element in xsamp:
+for element in xsamp3:
     y23.append(Momentz(element))
     y24.append(Momenty(element))
     y25.append(Shearz(element))
     y26.append(Sheary(element))
     y27.append(Torque(element))
 
-plt.plot(xsamp,y27)
+plt.plot(xsamp3,y27)
 plt.show()
