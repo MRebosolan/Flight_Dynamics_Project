@@ -30,7 +30,7 @@ def torquerloader3000():
     for element in xxx:
         y.append(interpolate(element,val1,ko[:41]))
         z.append(interpolate(element,val0,ko[:41]))
-
+    ''''
     fig, ax1 = plt.subplots()
 
     color = 'tab:red'
@@ -47,5 +47,5 @@ def torquerloader3000():
     ax2.tick_params(axis='y', labelcolor=color)
     plt.gca().invert_yaxis()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
-
+    '''
     return y,z

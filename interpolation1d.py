@@ -48,7 +48,6 @@ class interpolation:
 
         return b
     def interpolate(self,x,l,type,magni):
-
         if type == 'span':
             y = 0
             for j in range(81):
@@ -72,8 +71,6 @@ class interpolation:
 
 
         #return np.sum([[np.dot(self.basis(x,j),self.zdirection()[j])]for j in range(1,41)])
-
-
 '''
 i = interpolation()
 
@@ -85,12 +82,11 @@ list = []
     #list.append(l)
 l = 10
 for element in ill:
-    y.append(i.interpolate(element,l))
+    y.append(i.interpolate(element,l,'span',list))
 print(len(y))
 pyplot.plot(ill,y)
 pyplot.show()
 '''
-
 
 
 
