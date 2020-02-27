@@ -60,7 +60,7 @@ for n in range(0,10001):
         stringer_array.append([A_st, y,z])
         stringer_array.append([A_st, -y,z])
         h=h+2
-    elif z>0:
+    elif z>0 or nst==1:
         break
 for n in range(0,10001):
      last_room=0.5*m.pi*R-(h/2)*b
@@ -68,22 +68,22 @@ for n in range(0,10001):
      z2=(n-2)*(Ca-R)/10000
      y1=R
      y2=-R/(Ca-R)*z2+R
-     l_p=m.sqrt((z1-z2)**2+(y1-y2)**2)
-     z=round(z2,6)
-     y=round(y2,6)
+     l_p=round(m.sqrt((z1-z2)**2+(y1-y2)**2),7)
+     z=z2
+     y=y2
      for i in range (0,nst):
-         if abs(l_p-(i*b-last_room))<=0.000025:
+         if abs(l_p-round((i*b-last_room),7))<=0.000022:
              z_stringer.append(z)
              z_stringer.append(z)
              y_stringer.append(y)
              y_stringer.append(-y)
              stringer_array.append([A_st, y,z])
              stringer_array.append([A_st, -y,z])
-         elif z>(Ca-R):
+         elif z>(Ca-R) or nst==1:
                  break
    
 stringers=np.array(stringer_array)
-print(stringers)   
+print(stringers) 
 "airfoil placement"
 for i in range(0,101):
     z=-R+R*i/(100)
