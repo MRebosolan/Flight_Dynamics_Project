@@ -321,21 +321,5 @@ lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_l
 
 
 
-#PLOTTING
-y_deflects=[]
-z_deflects=[]
-for i in range(len(lst_Deflections_y_and_z_respect_x)):
-    y_deflects.append(lst_Deflections_y_and_z_respect_x[i][1])
-    z_deflects.append(lst_Deflections_y_and_z_respect_x[i][2])
 
-plt.plot(spanwise_locations, y_deflects)
-plt.show()
-plt.plot(spanwise_locations, z_deflects)
-plt.show()
-
-print(maximum_stress, member)
-
-#print(lst_Deflections_y_and_z_respect_x)
-#print(twist_list)
-#print(list(spanwise_locations))
 

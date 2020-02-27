@@ -1,10 +1,10 @@
 from DataPointReader import readerx
 from math import pi
-from math import cos,sin
+from math import cos
 from matplotlib import pyplot
-from mpl_toolkits.mplot3d import Axes3D
-from scipy import interpolate
-import numpy
+#from mpl_toolkits.mplot3d import Axes3D
+#from scipy import interpolate
+#import numpy
 def coordinates():
     data_points = readerx()
     ca = 0.547

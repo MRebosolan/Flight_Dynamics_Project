@@ -1,12 +1,12 @@
-import DataPointReader
+#import DataPointReader
 import loadfunction
-from functools import reduce
-import operator
+#from functools import reduce
+#import operator
 import numpy as np
 
-import math as m
-from matplotlib import pyplot
-import sympy
+#import math as m
+#from matplotlib import pyplot
+#import sympy
 value, xlist, z = loadfunction.coordinates()
 class interpolation:
 

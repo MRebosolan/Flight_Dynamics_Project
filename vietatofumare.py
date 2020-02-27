@@ -1,4 +1,7 @@
 import numpy as np
+import sys, os
+sys.path.clear()
+sys.path.append(os.path.realpath('..\\svvproject'))
 from newinter import torquerloader3000
 import math
 from integration1d import numerical_integrator1d,multiplicator
@@ -26,7 +29,7 @@ sin = math.sin(math.radians(26))
 xp = (x2 + (xa/2))
 xI = (x2 - (xa/2))
 armact = ((ha/2)-(zsc*cos))
-E = 72*10**6
+E = 73.1*10**6
 Izz = 1.2807456661786271e-05
 G = 28 * 10**6
 J = 1.5101498390705797e-05
@@ -71,8 +74,8 @@ quadhinge3z = (1/24)*numerical_integrator1d(multitron2(qz,xsamp,3),100,x3)
 dubhinge3z = (1/2)*numerical_integrator1d(multitron(torque,xsamp),100,x3)
 quadp = (1/24)*numerical_integrator1d(multitron2(qz,xsamp,3),100,xp)
 dubp = (1/2)*numerical_integrator1d(multitron(torque,xsamp),100,xp)
-print(quadhinge1)
-print(dublz)
+#print(quadhinge1)
+#print(dublz)
 vh1 = 0.01103*cos+1/E/Izz*(quadhinge1)-(dubhinge1)*zsc/G/J
 vh2 =(quadhinge2)/E/Izz - zsc/G/J*(dubhinge2)
 vh3 = 0.01642*cos+(quadhinge3)/E/Izz-zsc/G/J*(dubhinge3)+P/6/E/Izz*(x3-x2-xa/2)**3*sin+P*zsc/G/J*cos*(ha/2+zsc*sin)*(x3-x2-xa/2)+zsc*P*sin*zsc/G/J*(x3-x2-xa/2)
@@ -141,18 +144,21 @@ def Sheary(x):
     return numerical_integrator1d(qy,100,x) -1*cos*solution[0]*stepfunction2(x,x1)-1*cos*solution[1]*stepfunction2(x,x2)-1*cos*solution[2]*stepfunction2(x,x3)-1*sin*solution[3]*stepfunction2(x,x1)-1*sin*solution[4]*stepfunction2(x,x2)-1*sin*solution[5]*stepfunction2(x,x3)-1*sin*solution[6]*stepfunction2(x,xI) + P*sin*stepfunction2(x,xp)
 def Torque(x):
     return numerical_integrator1d(torque,100,x)+cos*zsc*stepfunction2(x,x1)*solution[0]+cos*zsc*stepfunction2(x,x2)*solution[1]+cos*zsc*stepfunction2(x,x3)*solution[2]+sin*zsc*stepfunction2(x,x1)*solution[3]+sin*zsc*stepfunction2(x,x2)*solution[4]+sin*zsc*stepfunction2(x,x3)*solution[5]+sin*zsc*stepfunction2(x,xI)*solution[6]+cos*(ha/2)*stepfunction2(x,xI)*solution[6] - P*cos*(ha/2)*stepfunction2(x,xp) - P*sin*zsc*stepfunction2(x,xp)
-xsamp3 = np.linspace(0,-2.76,277)
+xsamp3 = np.linspace(0,-2.77,278)
 y23 = []
 y24 = []
 y25 = []
 y26 = []
 y27 = []
 for element in xsamp3:
-    y23.append(Momentz(element))
-    y24.append(Momenty(element))
-    y25.append(Shearz(element))
-    y26.append(Sheary(element))
-    y27.append(Torque(element))
+    y23.append(int(Momentz(element)))
+    y24.append(int(Momenty(element)))
+    y25.append(int(Shearz(element)))
+    y26.append(int(Sheary(element)))
+    y27.append(int(Torque(element)))
 
+
+'''
 plt.plot(xsamp3,y27)
 plt.show()
+'''
