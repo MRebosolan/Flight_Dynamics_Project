@@ -27,13 +27,13 @@ theta = m.radians(26)  # rad
 P = 91.7*1000  # N
 
 "airfoil plot"
-R=ha/2          #radius 
-length=m.pi*R**2
+Ra=ha/2          #radius 
+length=m.pi*Ra**2
 
 Ab=wst*tst+(hst-tst)*tst #m
-l=2*m.sqrt((Ca-R)**2+(R)**2)+m.pi*R
+l=2*m.sqrt((Ca-Ra)**2+(Ra)**2)+m.pi*Ra
 b=l/nst
-k=b/R #radians
+k=b/Ra #radians
 
 z_coordinates=[]
 y_coordinates=[]
@@ -45,14 +45,14 @@ A_st=(hst)*tst+tst*wst
 z_stringer=[] 
 y_stringer=[]
 stringer_array=[]
-z_stringer.append(-R)
+z_stringer.append(-Ra)
 y_stringer.append(0)
-stringer_array.append([A_st, 0,-R])
+stringer_array.append([A_st, 0,-Ra])
 h=0
 for n in range(0,10001):
-    z=-R*m.cos(n*b/(R))
-    y=R*m.sin(n*b/(R))
-    if z<=0. and z>-R+0.01:
+    z=-Ra*m.cos(n*b/(Ra))
+    y=Ra*m.sin(n*b/(Ra))
+    if z<=0. and z>-Ra+0.01:
         z_stringer.append(z)
         z_stringer.append(z)
         y_stringer.append(y)
@@ -63,11 +63,11 @@ for n in range(0,10001):
     elif z>0 or nst==1:
         break
 for n in range(0,10001):
-     last_room=0.5*m.pi*R-(h/2)*b
+     last_room=0.5*m.pi*Ra-(h/2)*b
      z1=0
-     z2=(n-2)*(Ca-R)/10000
-     y1=R
-     y2=-R/(Ca-R)*z2+R
+     z2=(n-2)*(Ca-Ra)/10000
+     y1=Ra
+     y2=-Ra/(Ca-Ra)*z2+Ra
      l_p=round(m.sqrt((z1-z2)**2+(y1-y2)**2),7)
      z=z2
      y=y2
@@ -79,55 +79,55 @@ for n in range(0,10001):
              y_stringer.append(-y)
              stringer_array.append([A_st, y,z])
              stringer_array.append([A_st, -y,z])
-         elif z>(Ca-R) or nst==1:
+         elif z>(Ca-Ra) or nst==1:
                  break
    
 stringers=np.array(stringer_array)
 print(stringers) 
 "airfoil placement"
 for i in range(0,101):
-    z=-R+R*i/(100)
-    y=np.sqrt(R**2-z**2)
+    z=-Ra+Ra*i/(100)
+    y=np.sqrt(Ra**2-z**2)
     z_coordinates.append(z)
     y_coordinates.append(y)
 for i in range(-100,101):
     z=0
-    y=i/100*R
+    y=i/100*Ra
     z_spar.append(z)
     y_spar.append(y)
 for i in range(0,101):
-    z=i*(Ca-R)/100
-    y=-R/(Ca-R)*z+R
+    z=i*(Ca-Ra)/100
+    y=-Ra/(Ca-Ra)*z+Ra
     z_coordinates.append(z)
     y_coordinates.append(y)
 
 for i in range(0,101):
-    z=(100-i)*(Ca-R)/100
-    y=-R/(Ca-R)*z+R
+    z=(100-i)*(Ca-Ra)/100
+    y=-Ra/(Ca-Ra)*z+Ra
     z_coordinates.append(z)
     y_coordinates.append(-y)
 
 for i in range(0,101):
-    z=-R+R*(100-i)/100
-    y=np.sqrt(R**2-z**2)
+    z=-Ra+Ra*(100-i)/100
+    y=np.sqrt(Ra**2-z**2)
     z_coordinates.append(z)
     y_coordinates.append(-y)
 
 "Calculation Centroid"
-A_sk1=m.pi*R*tsk
-A_sk2=m.sqrt((Ca-R)**2+R**2)*tsk
+A_sk1=m.pi*Ra*tsk
+A_sk2=m.sqrt((Ca-Ra)**2+Ra**2)*tsk
 A_sp=ha*tsp
 
 A_tot=A_sk1+2*A_sk2+A_sp+nst*A_st
 print("Total area:", A_tot, "m^2")
 
 Az_st=A_st*sum(z_stringer) #m^2
-Az_sk1=A_sk1*2*-R/(m.pi)  #m^2
-Az_sk2=A_sk2*1/2*(Ca-R)   #m^2
+Az_sk1=A_sk1*2*-Ra/(m.pi)  #m^2
+Az_sk2=A_sk2*1/2*(Ca-Ra)   #m^2
 Ay_st=A_st*sum(y_stringer)
 Ay_sk1=A_sk1*0
-Ay_sk2=A_sk2*1/2*(R)
-Ay_sk3=A_sk2*-1/2*(R)
+Ay_sk2=A_sk2*1/2*(Ra)
+Ay_sk3=A_sk2*-1/2*(Ra)
 zc=(Az_st+Az_sk1+2*Az_sk2)/A_tot
 yc=(Ay_st+Ay_sk1+Ay_sk2+Ay_sk3)/A_tot          #due to symmetry it should be 0
 print("centroid",zc,yc)
@@ -144,17 +144,17 @@ plt.legend()
 
 "Moment of Inertia results"
 #Calculate moment of inertia of straght skin parts
-angle = m.atan(R/(Ca-R)) #radians
-length_beam = m.sqrt(R**2+(Ca-R)**2) #m
-Iyy_straight = ((tsk*length_beam**(3)*m.cos(angle)*m.cos(angle))/12+A_sk2*((Ca-R)/2-zc)**2) #2 beams
+angle = m.atan(Ra/(Ca-Ra)) #radians
+length_beam = m.sqrt(Ra**2+(Ca-Ra)**2) #m
+Iyy_straight = ((tsk*length_beam**(3)*m.cos(angle)*m.cos(angle))/12+A_sk2*((Ca-Ra)/2-zc)**2) #2 beams
 #print("Moment of inertia of straight skin parts Iyy is:", Iyy_straight, "m^4")
 
-Izz_straight = ((tsk*length_beam**(3)*m.sin(angle)*m.sin(angle))/12+A_sk2*(R/2)**2) #2 beams
+Izz_straight = ((tsk*length_beam**(3)*m.sin(angle)*m.sin(angle))/12+A_sk2*(Ra/2)**2) #2 beams
 #print("Moment of inertia of straight skin parts Izz is:", Izz_straight, "m^4")
 
 #Calculate moment of inertia of arc skin part
-Izz_arc = 1/2*m.pi*tsk*R**3         #
-Iyy_arc = 1/2*m.pi*tsk*R**3-4/m.pi*R**3*tsk+A_sk1*(2*R/m.pi+zc)**2
+Izz_arc = 1/2*m.pi*tsk*Ra**3         #
+Iyy_arc = 1/2*m.pi*tsk*Ra**3-4/m.pi*Ra**3*tsk+A_sk1*(2*Ra/m.pi+zc)**2
 #print("Moment of inertia of arc skin part Iyy is:", Iyy_arc, "m^4")
 #print("Moment of inertia of arc skin part Izz is:", Izz_arc, "m^4")
 
@@ -190,7 +190,7 @@ print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
 
 "torsional constant"
-J1=4*(0.5*m.pi*R**2)**2/((m.pi*R/tsk))
-J2=4*(R*(Ca-R))**2/((2*m.sqrt(R**2+(Ca-R)**2)/tsk))
+J1=4*(0.5*m.pi*Ra**2)**2/((m.pi*Ra/tsk))
+J2=4*(Ra*(Ca-Ra))**2/((2*m.sqrt(Ra**2+(Ca-Ra)**2)/tsk))
 J=J1+J2
 print("Torsional constant", J)
