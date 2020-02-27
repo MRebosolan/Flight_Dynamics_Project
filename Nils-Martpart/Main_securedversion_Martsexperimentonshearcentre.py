@@ -14,7 +14,6 @@ Created on Wed Feb 19 11:42:44 2020
 "--------------------------------------------------------------------------------------------------------------------------"
 "This section imports stuff, mainly the definitions of functions can then be used"
 
-import matplotlib.pyplot as plt
 import math 
 import numpy as np
 import sys, os
@@ -23,17 +22,17 @@ sys.path.append(os.path.realpath('..\\svvproject'))
 sys.path.append(os.path.realpath('..\\Nils-Martpart'))
 from Mart_function_definitions import normal_stress_x_bending_function, redundant_shear_flow, shear_centre, normal_stress_x_bending_function, von_mises_stress_function
 from definitions_max_stress_deflections import relation_shear_1_and_2_torque_and_torque, alternative_q_base_top1, alternative_q_base_spar, alternative_q_base_bottom1, alternative_q_base_sparA, alternative_q_base_top2, alternative_q_base_bottom2, alternative_q_base_sparB, deflection_z_bending_stress, deflection_y_bending_stress, rate_twist_at_x, twist, deflection_due_to_torque_and_bending
-from all_load_values import shear_y, shear_z, moment_y, moment_z, torque
+
 "--------------------------------------------------------------------------------------------------------------------------"
 "This section gives all the dummy inputs to check whether our model can handle the inputs"
 
 number_of_sections = 277
 aileron_length = 2.771
-moment_about_y_x_direction = moment_y()
-moment_about_z_x_direction = moment_z()
-shear_force_y_x_direction = shear_y()
-shear_force_z_x_direction =shear_z()
-torque_x_direction = torque()
+moment_about_y_x_direction = 27*[1279.4883539616128, 6219.791242600689, 17825.581062923993, 29427.931460799653, 48893.12680388145, 54825.338658432906, 39017.58694589116, 24526.26153542867, 10348.063679399138, 1101.0212717928678]+[1279.4883539616128, 6219.791242600689, 17825.581062923993, 29427.931460799653, 48893.12680388145, 54825.338658432906, 39017.58694589116, 24526.26153542867]
+moment_about_z_x_direction = 27*[390.0806917269376, -3988.5854398106285, -11680.013295493722, -18662.707925842213, -21746.73532002627, -13060.857569809456, -10813.19731312206, -7099.878856030742, -2946.297125578977, 743.2299928040601]+[390.0806917269376, -3988.5854398106285, -11680.013295493722, -18662.707925842213, -21746.73532002627, -13060.857569809456, -10813.19731312206, -7099.878856030742] #list
+shear_force_y_x_direction = 27*[-40781.69979639148, -24640.6565046931, -23940.74388521918, -27257.66312855513, 21286.8646846675, 14219.172310018326, 13295.952163577615, 8606.456251159278, 9175.060445230421, 90178.57730850359]+[-40781.69979639148, -24640.6565046931, -23940.74388521918, -27257.66312855513, 21286.8646846675, 14219.172310018326, 13295.952163577615, 8606.456251159278]#list
+shear_force_z_x_direction = 27*[-142927.31474694773, 50482.493662236666, 47337.025700824954, 28483.05709262811, 81931.43545731225, -47482.166123737414, -40350.671188979686, -50588.59448185765, -52326.54567550897, 109083.27249464425] +[-142927.31474694773, 50482.493662236666, 47337.025700824954, 28483.05709262811, 81931.43545731225, -47482.166123737414, -40350.671188979686, -50588.59448185765]#list
+torque_x_direction = 27*[660.4486232938361, 359.6417057176605, 278.01919764753063, -252.7818347402539, 3979.4813367791958, -186.49317497366204, 100.5164663455174, -276.95420613038345, -314.78817209316173, -839.0263536498007]+[660.4486232938361, 359.6417057176605, 278.01919764753063, -252.7818347402539, 3979.4813367791958, -186.49317497366204, 100.5164663455174, -276.95420613038345] #list
 spanwise_locations = np.arange(0, aileron_length , round(aileron_length/number_of_sections,4))
 moment_of_inertia_y = 6.864144198138948*10**(-5)
 moment_of_inertia_z = 1.2807449863434654*10**(-5)
@@ -50,12 +49,11 @@ area_circular_section = 0.5*math.pi*aileron_radius**2
 area_triangular_section = 0.5*aileron_height*(chord_length-aileron_height/2)
 x_location_hinge1 = 0.153
 x_location_hinge3 = 2.681
-deflection_hinge_1 = 0.01103*np.cos(26*np.pi/180)
-deflection_hinge_3 = 0.01642*np.cos(26*np.pi/180)
+deflection_hinge_1 = 0.01103
+deflection_hinge_3 = 0.01642
 boom_list=[[4.199999999999999e-05, 0.0, -0.1125], [4.199999999999999e-05, 0.06845563484361286, -0.08927528245913276], [4.199999999999999e-05, -0.06845563484361286, -0.08927528245913276], [4.199999999999999e-05, 0.10864704242813845, -0.029190241033918884], [4.199999999999999e-05, -0.10864704242813845, -0.029190241033918884], [4.199999999999999e-05, 0.101454975, 0.04265834100000001], [4.199999999999999e-05, -0.101454975, 0.04265834100000001], [4.199999999999999e-05, 0.083008575, 0.11390243700000002], [4.199999999999999e-05, -0.083008575, 0.11390243700000002], [4.199999999999999e-05, 0.06456228750000001, 0.18514609850000002], [4.199999999999999e-05, -0.06456228750000001, 0.18514609850000002], [4.199999999999999e-05, 0.046115887499999994, 0.25639019450000006], [4.199999999999999e-05, -0.046115887499999994, 0.25639019450000006], [4.199999999999999e-05, 0.027669487500000006, 0.32763429050000004], [4.199999999999999e-05, -0.027669487500000006, 0.32763429050000004], [4.199999999999999e-05, 0.0092232, 0.39887795200000004], [4.199999999999999e-05, -0.0092232, 0.39887795200000004]]
 elasticity_modulus=73.1*10**9
 shear_modulus=28*10**9
-J=1.5101498390705797e-05
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the shear flow due to torsion. It is the same in every cross-section, so it gives outputs only as fixed values per thingey"
 
@@ -92,7 +90,8 @@ switch=0
 for j in range(0, len(shear_force_y_x_direction)):
     shear_force_y = shear_force_y_x_direction[j]
     shear_force_z = shear_force_z_x_direction[j]
-    
+    shear_force_y = 1
+    shear_force_z = 0
     z_pos = 0
     y_pos = aileron_height/2
     q_base_list_top_1, s1_list  = alternative_q_base_top1(shear_force_y, shear_force_z, moment_of_inertia_y, moment_of_inertia_z, integral_step, aileron_height, skin_thickness, z_pos, y_pos, boom_list)
@@ -162,27 +161,27 @@ for j in range(0, len(shear_force_y_x_direction)):
     "The upcoming part adds the redundant, base and torque shear flows"    
     q_total_list_top_1 = []    
     for i in range(0, len(q_base_list_top_1)):
-        q_total_list_top_1.append(q_base_list_top_1[i]+redundant_shear_flow_circular_section+shear_flow_torque_circular_part_list[j])
+        q_total_list_top_1.append(q_base_list_top_1[i]+redundant_shear_flow_circular_section)#+shear_flow_torque_circular_part_list[j])
         
     q_total_list_top_2 = []
     for i in range(0, len(q_base_list_top_2)):
-        q_total_list_top_2.append(q_base_list_top_2[i]+redundant_shear_flow_triangular_section+shear_flow_torque_triangular_part_list[j])
+        q_total_list_top_2.append(q_base_list_top_2[i]+redundant_shear_flow_triangular_section)#+shear_flow_torque_triangular_part_list[j])
         
     q_total_list_bottom_1 = []
     for i in range(0, len(q_base_list_bottom_1)):
-        q_total_list_bottom_1.append(q_base_list_bottom_1[i]+redundant_shear_flow_circular_section+shear_flow_torque_circular_part_list[j])
+        q_total_list_bottom_1.append(q_base_list_bottom_1[i]+redundant_shear_flow_circular_section)#+shear_flow_torque_circular_part_list[j])
         
     q_total_list_bottom_2 = []
     for i in range(0, len(q_base_list_bottom_2)):
-        q_total_list_bottom_2.append(q_base_list_bottom_2[i]+redundant_shear_flow_triangular_section+shear_flow_torque_triangular_part_list[j])
+        q_total_list_bottom_2.append(q_base_list_bottom_2[i]+redundant_shear_flow_triangular_section)#+shear_flow_torque_triangular_part_list[j])
         
     q_total_list_spar_A = []
     for i in range(0, len(q_base_list_spar_A)):
-        q_total_list_spar_A.append(q_base_list_spar_A[i]-redundant_shear_flow_circular_section+redundant_shear_flow_triangular_section-shear_flow_torque_circular_part_list[j]+shear_flow_torque_triangular_part_list[j])
+        q_total_list_spar_A.append(q_base_list_spar_A[i]-redundant_shear_flow_circular_section+redundant_shear_flow_triangular_section)#-shear_flow_torque_circular_part_list[j]+shear_flow_torque_triangular_part_list[j])
         
     q_total_list_spar_B = []
     for i in range(0, len(q_base_list_spar_B)):
-        q_total_list_spar_B.append(q_base_list_spar_B[i]-redundant_shear_flow_circular_section+redundant_shear_flow_triangular_section-shear_flow_torque_circular_part_list[j]+shear_flow_torque_triangular_part_list[j])
+        q_total_list_spar_B.append(q_base_list_spar_B[i]-redundant_shear_flow_circular_section+redundant_shear_flow_triangular_section)#-shear_flow_torque_circular_part_list[j]+shear_flow_torque_triangular_part_list[j])
 
     q_total_list_spar = q_total_list_spar_B+q_total_list_spar_A
     s5_list = [sB_list + sA_list]
@@ -292,12 +291,12 @@ for j in range(0, len(shear_force_y_x_direction)):
 
 
 list_max_stress=[max(maximum_stress_s1), max(maximum_stress_s2), max(maximum_stress_s3), max(maximum_stress_s4), max(maximum_stress_s5)]
-#print(list_max_stress)
+print(list_max_stress)
 maximum_stress=max(list_max_stress)
 index_max_stress=list_max_stress.index(maximum_stress)
 
 member=index_max_stress+1
-#print(member)
+print(member)
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the computation of shear centre"
 q_total_top1 = q_total_list_top_1
@@ -305,9 +304,10 @@ q_total_bottom1 = q_total_list_bottom_1
 q_total_top2 = q_total_list_top_2
 q_total_bottom2 = q_total_list_bottom_2
 
-shear_centre_location_wrt_spar = -shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians,s1_list, s2_list, s3_list, s4_list )
+shear_centre_location_wrt_spar = -shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians,s1_list, s2_list, s3_list, s4_list, skin_thickness )
 
-#print(shear_centre_location_wrt_spar)
+print(shear_centre_location_wrt_spar)
+print("piemel")
 
 shear_center_z=-0.11922705644352412+aileron_height/2
 
@@ -319,30 +319,9 @@ integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spa
 
 
 
-twist_list = twist(shear_modulus,J,spanwise_locations, rate_of_twist_x_list)[1]
-lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(elasticity_modulus,moment_of_inertia_y, moment_of_inertia_z, twist_list, spanwise_locations, 0, shear_center_z, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
+twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)[0], twist(spanwise_locations, rate_of_twist_x_list)[1]
+lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_list, spanwise_locations, 0, shear_center_z, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
 
-
-
-#PLOTTING
-y_deflects=[]
-z_deflects=[]
-for i in range(len(lst_Deflections_y_and_z_respect_x)):
-    y_deflects.append(lst_Deflections_y_and_z_respect_x[i][1])
-    z_deflects.append(lst_Deflections_y_and_z_respect_x[i][2])
-
-plt.plot(spanwise_locations, y_deflects)
-plt.show()
-plt.plot(spanwise_locations, z_deflects)
-plt.show()
-
-plt.plot(spanwise_locations, twist_list)
-plt.show()
-print(maximum_stress, member)
-
-#print(lst_Deflections_y_and_z_respect_x)
-#print(twist_list)
-#print(list(spanwise_locations))
 
 #print(maximum_stress, member)
 #print(lst_Deflections_y_and_z_respect_x)

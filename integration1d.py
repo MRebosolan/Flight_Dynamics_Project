@@ -1,11 +1,12 @@
 import numpy as np
+from math import *
 import matplotlib.pyplot as plt
 from interpolation1d import interpolation
 def multiplicator(loadfunction):
     xprime1 = 0
     xprime2 = -0.5464859422096491
     xprimes = np.linspace(xprime1, xprime2, pointnum)
-    xhinge = (-0.225)/2
+    xhinge = -0.23172705644352412
     newfunction = []
     for c, element in enumerate(loadfunction):
         new = element*( xhinge - xprimes[c])
@@ -22,6 +23,7 @@ def numerical_integrator1d(loadfunction,pointnum,xprime2):
                 #i is index of element in the row
         tot += (loadfunction[c] + loadfunction[c+1]) * (xprimes[c+1] - xprimes[c]) * 0.5
     return tot
+
 pointnum = 400
 pointnum2 = pointnum - 1
 i = interpolation()

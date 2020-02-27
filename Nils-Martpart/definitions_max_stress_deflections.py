@@ -365,36 +365,29 @@ def relation_shear_1_and_2_torque_and_torque(Overall_torque, aileron_height, ski
     t=True
     length_after_spar=(chord_length-aileron_height*0.5)
     radius=aileron_height/2
-    A_1=(np.pi)**2*aileron_height/2 #cross section area 1 
-    A_2=aileron_height*(length_after_spar) #cros section area 2
+    A_1=((np.pi)**2*(aileron_height/2)**2)/2 #cross section area 1 
+    A_2=radius*(length_after_spar) #cros section area 2
     
-    K_1= radius*np.pi/(skin_thickness)+2*aileron_height/spar_thickness
-    K_2= (2/spar_thickness)*math.sqrt(length_after_spar**2+radius**2)+aileron_height/spar_thickness
+    K_1= (radius*np.pi/(skin_thickness)+aileron_height/spar_thickness)*A_2/A_1 + aileron_height/spar_thickness
+    K_2= (2/skin_thickness)*math.sqrt(length_after_spar**2+radius**2)+(aileron_height/spar_thickness)*(1+A_2/A_1)
     K_f=K_2/K_1
     
-    shear_2=0.0
-    while t is True:
-        shear_1_A=(Overall_torque-2*A_2*shear_2)/(2*A_1)
-        shear_1_B=K_f*shear_2
+    shear_2= Overall_torque/(2*A_1*K_f+2*A_2)
+    shear_1 =shear_2*K_f
 
-        shear_2+=0.0001
-        
-        if round(shear_1_A,4)==round(shear_1_B,4):
-            t=False
-            
-    return shear_1_A/K_f, shear_1_A, K_f
+    return shear_2, shear_1, K_f
 
-def deflection_z_bending_stress(moment_y_set,x_set_of_positions,MOI_y_prime):
+def deflection_z_bending_stress(moment_y_set,x_set_of_positions,MOI_y_prime, E_modulus):
     #deflection=int_numerical+D*x+C
     #finding the first step of the integral
     #1A=-K*dx
     i=0
     K_list=[]
     while i<=(len(x_set_of_positions)-1):
-        K=-moment_y_set[i]/MOI_y_prime
+        K=-moment_y_set[i]/(MOI_y_prime*E_modulus)
         K_list.append(K)
         i+=1
-        
+
     integral_value1=0
     integral_values1=[]
     i=1
@@ -428,18 +421,18 @@ def deflection_z_bending_stress(moment_y_set,x_set_of_positions,MOI_y_prime):
     integral_values2.insert(0,0)   
     return integral_values2
 
-def deflection_y_bending_stress(moment_z_set,x_set_of_positions,MOI_z_prime):
+def deflection_y_bending_stress(moment_z_set,x_set_of_positions,MOI_z_prime, E_modulus):
     #deflection=int_numerical+D*x+C
     #finding the first step of the integral
     #1A=-K*dx
     i=0
     K_list=[]
     while i<=(len(x_set_of_positions)-1):
-        K=-moment_z_set[i]/MOI_z_prime
+        K=-moment_z_set[i]/(MOI_z_prime*E_modulus)
         K_list.append(K)
         i+=1
     
-        
+     
     integral_value1=0
     integral_values1=[]
     i=1
@@ -457,8 +450,7 @@ def deflection_y_bending_stress(moment_z_set,x_set_of_positions,MOI_z_prime):
         K=integral_values1[i]
         K_list.append(K)
         i+=1
-    
-        
+     
     integral_value2=0
     i=1
     integral_values2=[]
@@ -472,20 +464,20 @@ def deflection_y_bending_stress(moment_z_set,x_set_of_positions,MOI_z_prime):
         i+=1
     integral_values2.insert(0,0)
     
-    
     return integral_values2
 
 
-def rate_twist_at_x(shear_torque_1,shear_torque_2, shear_zero_1,shear_zero_2, aileron_height, spar_thickness, skin_thickness):
-    rate_twist_torque = shear_torque_1*np.pi*aileron_height*0.5/skin_thickness+(shear_torque_1-shear_torque_2)*aileron_height/spar_thickness
-    rate_twist_zero=shear_zero_1*np.pi*aileron_height*0.5/skin_thickness+(shear_zero_1-shear_zero_2)*aileron_height/spar_thickness
+def rate_twist_at_x(shear_torque_1,shear_torque_2, shear_zero_1,shear_zero_2, aileron_height, spar_thickness, skin_thickness, shear_modulus):
+    rate_twist_torque = (shear_torque_1*np.pi*aileron_height*0.5/skin_thickness+(shear_torque_1-shear_torque_2)*aileron_height/spar_thickness)/shear_modulus
+    rate_twist_zero=(shear_zero_1*np.pi*aileron_height*0.5/skin_thickness+(shear_zero_1-shear_zero_2)*aileron_height/spar_thickness)/shear_modulus
     
     rate_twist_x=rate_twist_zero+rate_twist_torque
     
     return rate_twist_x
 
-def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to start at zero
+def twist(G,J, x_set_of_positions, rate_twist_at_x):#the x set of positions has to start at zero
     #the x_set_of_positions starts at the origin, that is at hinge 1. thus, hinge 1 is fixed in twist
+    C3=-15.2202193
     x_set_of_twist=[]
     x_set=[]
     #x_set_of_positions=x_set_of_positions[1:]
@@ -495,18 +487,23 @@ def twist(x_set_of_positions, rate_twist_at_x):#the x set of positions has to st
         if i==1:
             twist+=(x_set_of_positions[i])*rate_twist_at_x[i] #calculates the twist at each point
         else:
-            twist+=(x_set_of_positions[i]-x_set_of_positions[i-1])*rate_twist_at_x[i] #calculates the twist at each point
+            twist+=(x_set_of_positions[i])*rate_twist_at_x[i] #calculates the twist at each point
 
         x_set_of_twist.append(twist)
         x_set.append(x_set_of_positions[i])
         i+=1
     x_set_of_twist.insert(0,0)
+
+    for i in range(len(x_set_of_twist)):
+        x_set_of_twist[i]+=-C3/(G*J)
+
+        
     return twist, x_set_of_twist, x_set#the first output is the twist at the edge of the aileron
         
     
-def deflection_due_to_torque_and_bending(x_set_of_twist, x_set_of_positions, shear_center_y, shear_center_z, deflection_y_bending_set, deflection_z_bending_set, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3):
+def deflection_due_to_torque_and_bending(E, I_zz, I_yy, x_set_of_twist, x_set_of_positions, shear_center_y, shear_center_z, deflection_y_bending_set, deflection_z_bending_set, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3 ):
     lst_Deflections=[]
-    print(len(x_set_of_twist))
+
     for i in range(len(x_set_of_twist)):
         distance=math.sqrt(shear_center_y**2+shear_center_z**2)
         delta_deflec_y_torque=np.sin(x_set_of_twist[i])*distance
@@ -518,26 +515,46 @@ def deflection_due_to_torque_and_bending(x_set_of_twist, x_set_of_positions, she
     
     index1=list(x_set_of_positions).index(round(x_location_hinge1,2))
     index3=list(x_set_of_positions).index(round(x_location_hinge3,2))
-    
+
+    diff_x3_x1=round(x_location_hinge3,2)-round(x_location_hinge1,2)
     #using the boundary conditions to find the integration constants, y deflections
-    D=((deflection_hinge_3-deflection_hinge_1)+(lst_Deflections[index1][1]-lst_Deflections[index3][1]))/(-1*x_location_hinge1+ x_location_hinge3)
-    C=deflection_hinge_3-lst_Deflections[index3][2]-D*x_location_hinge3
+    D1=((-1*deflection_hinge_1+lst_Deflections[index1][1]-lst_Deflections[index3][1]+deflection_hinge_3))/(diff_x3_x1)
+    C1=(deflection_hinge_1-lst_Deflections[index1][1]-D1*round(x_location_hinge1,2))
     
     #using the boundary conditions to find the integration constants, z deflections
-    D_z=(lst_Deflections[index1][2]-lst_Deflections[index3][2])/(-1*x_location_hinge1+ x_location_hinge3)
-    C_z=lst_Deflections[index3][2]-D*x_location_hinge3
-    
-    print(len(lst_Deflections), len(x_set_of_positions))
-    print(lst_Deflections[0])
-    print(lst_Deflections[-1])
+    D_z1=((lst_Deflections[index1][2]-lst_Deflections[index3][2]))/(diff_x3_x1)
+    C_z1=(-lst_Deflections[index1][2]-D_z1*round(x_location_hinge1,2))
+
+
+
+    D=6.67973948
+    C=-0.3474889
+    D_z=36.54718612
+    C_z=29.79453841
+
+    print(D1,C1,D_z1,C_z1)
+    print(D,C,D_z,C_z)
+
     #correcting the data using the constants
     i=0
+    lst_final_Deflections=[]
     while i<=(len(x_set_of_positions)-1):
-        lst_Deflections[i][1]=lst_Deflections[i][1]+D*x_set_of_positions[i]+C
-        lst_Deflections[i][2]=lst_Deflections[i][2]+D_z*x_set_of_positions[i]+C_z
+        y_deflect=lst_Deflections[i][1]+(D*x_set_of_positions[i]+C)/(E*I_zz)
+        z_deflect=lst_Deflections[i][2]+(D_z*x_set_of_positions[i]+C_z)/(E*I_yy)
+                
+        lst_final_Deflections.append([x_set_of_positions[i], y_deflect, z_deflect])
+        
         i+=1
         
-    return lst_Deflections
+    #print(lst_Deflections[index3][1], D, x_set_of_positions[index3], C)
+    #print(lst_Deflections[index3][2], D_z, x_set_of_positions[index3], C_z)
+        
+    return lst_final_Deflections
+
+
+
+
+
 
 
 
