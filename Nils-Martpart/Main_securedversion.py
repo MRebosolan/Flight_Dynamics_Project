@@ -14,6 +14,7 @@ Created on Wed Feb 19 11:42:44 2020
 "--------------------------------------------------------------------------------------------------------------------------"
 "This section imports stuff, mainly the definitions of functions can then be used"
 
+import matplotlib.pyplot as plt
 import math 
 import numpy as np
 import sys, os
@@ -49,8 +50,8 @@ area_circular_section = 0.5*math.pi*aileron_radius**2
 area_triangular_section = 0.5*aileron_height*(chord_length-aileron_height/2)
 x_location_hinge1 = 0.153
 x_location_hinge3 = 2.681
-deflection_hinge_1 = 0.01103
-deflection_hinge_3 = 0.01642
+deflection_hinge_1 = 0.01103*np.cos(26*np.pi/180)
+deflection_hinge_3 = 0.01642*np.cos(26*np.pi/180)
 boom_list=[[4.199999999999999e-05, 0.0, -0.1125], [4.199999999999999e-05, 0.06845563484361286, -0.08927528245913276], [4.199999999999999e-05, -0.06845563484361286, -0.08927528245913276], [4.199999999999999e-05, 0.10864704242813845, -0.029190241033918884], [4.199999999999999e-05, -0.10864704242813845, -0.029190241033918884], [4.199999999999999e-05, 0.101454975, 0.04265834100000001], [4.199999999999999e-05, -0.101454975, 0.04265834100000001], [4.199999999999999e-05, 0.083008575, 0.11390243700000002], [4.199999999999999e-05, -0.083008575, 0.11390243700000002], [4.199999999999999e-05, 0.06456228750000001, 0.18514609850000002], [4.199999999999999e-05, -0.06456228750000001, 0.18514609850000002], [4.199999999999999e-05, 0.046115887499999994, 0.25639019450000006], [4.199999999999999e-05, -0.046115887499999994, 0.25639019450000006], [4.199999999999999e-05, 0.027669487500000006, 0.32763429050000004], [4.199999999999999e-05, -0.027669487500000006, 0.32763429050000004], [4.199999999999999e-05, 0.0092232, 0.39887795200000004], [4.199999999999999e-05, -0.0092232, 0.39887795200000004]]
 elasticity_modulus=73.1*10**9
 shear_modulus=28*10**9
@@ -320,6 +321,25 @@ integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spa
 twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)[0], twist(spanwise_locations, rate_of_twist_x_list)[1]
 lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_list, spanwise_locations, 0, shear_center_z, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
 
+
+
+#PLOTTING
+y_deflects=[]
+z_deflects=[]
+for i in range(len(lst_Deflections_y_and_z_respect_x)):
+    y_deflects.append(lst_Deflections_y_and_z_respect_x[i][1])
+    z_deflects.append(lst_Deflections_y_and_z_respect_x[i][2])
+
+plt.plot(spanwise_locations, y_deflects)
+plt.show()
+plt.plot(spanwise_locations, z_deflects)
+plt.show()
+
+print(maximum_stress, member)
+
+#print(lst_Deflections_y_and_z_respect_x)
+#print(twist_list)
+#print(list(spanwise_locations))
 
 #print(maximum_stress, member)
 #print(lst_Deflections_y_and_z_respect_x)

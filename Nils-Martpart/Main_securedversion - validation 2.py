@@ -320,9 +320,22 @@ twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)[0], tw
 lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_list, spanwise_locations, 0, shear_center_z, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
 
 
-#print(maximum_stress, member)
-#print(lst_Deflections_y_and_z_respect_x)
 
+#PLOTTING
+y_deflects=[]
+z_deflects=[]
+for i in range(len(lst_Deflections_y_and_z_respect_x)):
+    y_deflects.append(lst_Deflections_y_and_z_respect_x[i][1])
+    z_deflects.append(lst_Deflections_y_and_z_respect_x[i][2])
+
+plt.plot(spanwise_locations, y_deflects)
+plt.show()
+plt.plot(spanwise_locations, z_deflects)
+plt.show()
+
+print(maximum_stress, member)
+
+#print(lst_Deflections_y_and_z_respect_x)
 #print(twist_list)
 #print(list(spanwise_locations))
 
