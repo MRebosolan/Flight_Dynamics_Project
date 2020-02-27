@@ -131,7 +131,7 @@ Ay_sk3=A_sk2*-1/2*(R)
 zc=(Az_st+Az_sk1+2*Az_sk2)/A_tot
 yc=(Ay_st+Ay_sk1+Ay_sk2+Ay_sk3)/A_tot          #due to symmetry it should be 0
 print("centroid",zc,yc)
-print(l)
+
 "airfoil plot"
 
 plt.plot(z_coordinates,y_coordinates, color='black',label="Periphery")
