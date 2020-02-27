@@ -27,26 +27,26 @@ def redundant_shear_flow(q_b_s1, s1, q_b_s4, s4, aileron_radius, aileron_angle_r
     redundant_shear_flow_triangular_section = redundant_shear_flow_circular_section*ratio_between_redundant_shear_flows
     return redundant_shear_flow_circular_section, redundant_shear_flow_triangular_section
 
-def shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians, s1_list, s2_list, s3_list, s4_list):
+def shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians, s1_list, s2_list, s3_list, s4_list, skin_thickness):
     moment_q1 = 0
     l = s1_list[1]
     for q in q_total_top1:
-        moment_q1 = moment_q1 + q*aileron_height/2*l
+        moment_q1 = moment_q1 + q*aileron_height/2*l*skin_thickness
     
     moment_q2 = 0
     l = s3_list[1]
     for q in q_total_bottom1:
-        moment_q2 = moment_q2 + q*aileron_height/2*l
+        moment_q2 = moment_q2 + q*aileron_height/2*l*skin_thickness
     
     moment_q3 = 0
     l = s2_list[1]
     for q in q_total_top2:
-        moment_q3 = moment_q3 + q*np.cos(aileron_angle_radians)*aileron_height/2*l
+        moment_q3 = moment_q3 + q*np.cos(aileron_angle_radians)*aileron_height/2*l*skin_thickness
         
     moment_q4 = 0
     l = s4_list[1]
     for q in q_total_bottom2:
-        moment_q4 = moment_q4 + q*np.cos(aileron_angle_radians)*aileron_height/2*l        
+        moment_q4 = moment_q4 + q*np.cos(aileron_angle_radians)*aileron_height/2*l*skin_thickness        
     
     eta = moment_q1+moment_q2+moment_q3+moment_q4
     
