@@ -190,30 +190,7 @@ print("Total moment of inertia Iyy =", Iyy_total, "m^4")
 print("Total moment of inertia Izz =", Izz_total, "m^4") 
 
 "torsional constant"
-A1 = m.pi * R ** 2 / 2.
-A2 = (Ca - R) * R
-l2=m.sqrt((Ca-R)**2+R**2)
-
-A = np.array([[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]])
-b = np.array([0., 0., 0.])
-
-### First row
-A[0, 0] = 2. * A1
-A[0, 1] = 2. * A2
-b[0] = 1
-
-### Second row
-A[1, 0] = (R * m.pi / tsk + 2 * R / tsp) / (2 * A1)
-A[1, 1] = (-2 * R / tsp) / (2 * A1)
-A[1, 2] = -1.
-b[1] = 0.
-
-### Third row
-A[2, 0] = (-2 * R / tsp) / (2 * A2)
-A[2, 1] = (2 * l2 / tsk + 2 * R / tsp) / (2 * A2)
-A[2, 2] = -1
-b[2] = 0.
-
-solution = np.linalg.solve(A, b)
-J = 1. / solution[-1]
-print(J)
+J1=4*(0.5*m.pi*R**2)**2/((m.pi*R/tsk))
+J2=4*(R*(Ca-R))**2/((2*m.sqrt(R**2+(Ca-R)**2)/tsk))
+J=J1+J2
+print("Torsional constant", J)
