@@ -56,7 +56,7 @@ max_stress_member_actual=
 
 #Adjusting so that the numerical set of twist and deflections have the same number of points along the span
 new_x_set=Validation_definitions.creating_format_x(108, span)
-len_twists=len(twists_values)
+
 
     #converting the deflections to 108 nodes
 new_deflections_num_model= Validation_definitions.converting_deflection_list(new_x_set, deflection_values)
