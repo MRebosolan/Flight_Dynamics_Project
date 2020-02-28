@@ -9,7 +9,7 @@ import math
 import numpy as np
 
 def normal_stress_x_bending_function(bending_moment_z, moment_of_inertia_y, y_distance_to_centroid, bending_moment_y, moment_of_inertia_z, z_distance_to_centroid):
-    normal_stress_x_bending = ((bending_moment_z*moment_of_inertia_y)*y_distance_to_centroid + bending_moment_y*moment_of_inertia_z*z_distance_to_centroid)/moment_of_inertia_z/moment_of_inertia_y
+    normal_stress_x_bending = (bending_moment_z*y_distance_to_centroid)/moment_of_inertia_z+ bending_moment_y*z_distance_to_centroid/(moment_of_inertia_y)
     return normal_stress_x_bending
 
 def von_mises_stress_function(normal_stress_x_bending, shear_stress_total):

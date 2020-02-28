@@ -22,17 +22,17 @@ sys.path.append(os.path.realpath('..\\svvproject'))
 sys.path.append(os.path.realpath('..\\Nils-Martpart'))
 from Mart_function_definitions import normal_stress_x_bending_function, redundant_shear_flow, shear_centre, normal_stress_x_bending_function, von_mises_stress_function
 from definitions_max_stress_deflections import relation_shear_1_and_2_torque_and_torque, alternative_q_base_top1, alternative_q_base_spar, alternative_q_base_bottom1, alternative_q_base_sparA, alternative_q_base_top2, alternative_q_base_bottom2, alternative_q_base_sparB, deflection_z_bending_stress, deflection_y_bending_stress, rate_twist_at_x, twist, deflection_due_to_torque_and_bending
-
+from all_load_values import shear_y2, shear_z2, moment_y2, moment_z2, torque2
 "--------------------------------------------------------------------------------------------------------------------------"
 "This section gives all the dummy inputs to check whether our model can handle the inputs"
 
 number_of_sections = 266
 aileron_length = 2.661
-moment_about_y_x_direction =
-moment_about_z_x_direction = 
-shear_force_y_x_direction = 
-shear_force_z_x_direction = 
-torque_x_direction = 
+moment_about_y_x_direction = moment_y2()
+moment_about_z_x_direction =  moment_z2()
+shear_force_y_x_direction = shear_y2()
+shear_force_z_x_direction = shear_z2()
+torque_x_direction = torque2()
 spanwise_locations = np.arange(0, aileron_length , round(aileron_length/number_of_sections,4))
 moment_of_inertia_y = 8.710953452731196*10**(-5)
 moment_of_inertia_z = 1.0510952632762589*10**(-5)
@@ -54,6 +54,7 @@ deflection_hinge_3 = 0.0184 *np.cos(28*np.pi/180)
 boom_list=[[4.2e-05, 0.0, -0.1025], [4.2e-05, 0.07160610879327349, -0.07334040621298657], [4.2e-05, -0.07160610879327349, -0.07334040621298657], [4.2e-05, 0.10247065573131683, -0.002452491385090335], [4.2e-05, -0.10247065573131683, -0.002452491385090335], [4.2e-05, 0.08714549999999999, 0.0752745], [4.2e-05, -0.08714549999999999, 0.0752745], [4.2e-05, 0.07130105, 0.15295094999999997], [4.2e-05, -0.07130105, 0.15295094999999997], [4.2e-05, 0.055456599999999995, 0.23062739999999998], [4.2e-05, -0.055456599999999995, 0.23062739999999998], [4.2e-05, 0.023766675, 0.38598532499999993], [4.2e-05, -0.023766675, 0.38598532499999993], [4.2e-05, 0.007922224999999991, 0.463661775], [4.2e-05, -0.007922224999999991, 0.463661775]]
 elasticity_modulus=73.1*10**9
 shear_modulus=28*10**9
+J=0
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the shear flow due to torsion. It is the same in every cross-section, so it gives outputs only as fixed values per thingey"
 
@@ -196,26 +197,26 @@ for j in range(0, len(shear_force_y_x_direction)):
     s1_y_list = []
     s1_z_list = []
     for s1 in s1_list:
-        s1_y_list.append(np.sin(s1))
-        s1_z_list.append(-np.cos(s1))
+        s1_y_list.append(aileron_height*0.5*np.sin(s1/(aileron_height*0.5)))
+        s1_z_list.append(aileron_height*0.5-aileron_height*0.5*np.cos(s1/(aileron_height*0.5)))
         
     s2_y_list = []
     s2_z_list = []
     for s2 in s2_list:
         s2_y_list.append(aileron_height/2-s2*np.sin(aileron_angle_radians))
-        s2_z_list.append(s2*np.cos(aileron_angle_radians))
+        s2_z_list.append(-s2*np.cos(aileron_angle_radians))
         
     s3_y_list = []
     s3_z_list = []
     for s3 in s3_list:
-        s3_y_list.append(-s3*np.sin(aileron_angle_radians))
-        s3_z_list.append((chord_length-0.5*aileron_height)-s3*np.cos(aileron_angle_radians))
+        s3_y_list.append(-aileron_height*0.5*np.sin(np.pi*0.5-s1/(aileron_height*0.5)))
+        s3_z_list.append(aileron_height*0.5*np.cos(np.pi*0.5-s1/(aileron_height*0.5)))
         
     s4_y_list = []
     s4_z_list = []
     for s4 in s4_list:
-        s4_y_list.append(-aileron_height/2+np.cos(s4))
-        s4_z_list.append(-np.sin(s4))
+        s4_y_list.append(-aileron_height/2+s4*np.cos(aileron_angle_radians))
+        s4_z_list.append(-s4*np.sin(aileron_angle_radians))
         
     s5_y_list = []
     s5_z_list = []
@@ -223,7 +224,8 @@ for j in range(0, len(shear_force_y_x_direction)):
         append=-1*aileron_height/2+s5
         s5_y_list.append(append)
         s5_z_list.append(0)
-        
+    
+   
     "This part will calculate, for every section, the stress throughout. It will return the maximum stress."
     maximum_stress_stored_s1 = 0
     for i in range(len(s1_list)):
@@ -285,16 +287,16 @@ for j in range(0, len(shear_force_y_x_direction)):
     
     rate_of_twist_x = rate_twist_at_x(shear_flow_torque_circular_part_list[j], shear_flow_torque_triangular_part_list[j], redundant_shear_flow_circular_section, redundant_shear_flow_triangular_section, aileron_height, spar_thickness, skin_thickness, shear_modulus)
     rate_of_twist_x_list.append(rate_of_twist_x)
-    
-
 
 
 list_max_stress=[max(maximum_stress_s1), max(maximum_stress_s2), max(maximum_stress_s3), max(maximum_stress_s4), max(maximum_stress_s5)]
+print(list_max_stress)
 maximum_stress=max(list_max_stress)
+print(max(list_max_stress))
 index_max_stress=list_max_stress.index(maximum_stress)
 
 member=index_max_stress+1
-print(member, maximum_stress)
+print(member)
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will handle the computation of shear centre"
 q_total_top1 = q_total_list_top_1
@@ -302,22 +304,76 @@ q_total_bottom1 = q_total_list_bottom_1
 q_total_top2 = q_total_list_top_2
 q_total_bottom2 = q_total_list_bottom_2
 
-shear_centre_location_wrt_spar = -shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians,s1_list, s2_list, s3_list, s4_list )
+#shear_centre_location_wrt_spar = -shear_centre(q_total_top1, q_total_bottom1, q_total_top2, q_total_bottom2, aileron_height, aileron_angle_radians,s1_list, s2_list, s3_list, s4_list )
 
-print(shear_centre_location_wrt_spar)
+#print(shear_centre_location_wrt_spar)
 
 shear_center_z=-0.10856995078063854+aileron_height/2
 
 "--------------------------------------------------------------------------------------------------------------------------"
 "This part will cover the bending equations and deflection due to bending and torque"
 
-integral_values2_z = deflection_z_bending_stress(moment_about_y_x_direction, spanwise_locations, moment_of_inertia_y, elasticity_modulus)
-integral_values2_y = deflection_y_bending_stress(moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z, elasticity_modulus)   
+integral_values2_z = deflection_z_bending_stress(elasticity_modulus,moment_of_inertia_y, moment_about_y_x_direction, spanwise_locations, moment_of_inertia_y, elasticity_modulus)
+integral_values2_y = deflection_y_bending_stress(elasticity_modulus,moment_of_inertia_z,moment_about_z_x_direction, spanwise_locations, moment_of_inertia_z, elasticity_modulus)   
 
 
 
-twist_total, twist_list = twist(spanwise_locations, rate_of_twist_x_list)[0], twist(spanwise_locations, rate_of_twist_x_list)[1]
-lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(twist_list, spanwise_locations, 0, shear_center_z, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
+twist_list = twist(shear_modulus,J,spanwise_locations, rate_of_twist_x_list)[1]
+lst_Deflections_y_and_z_respect_x = deflection_due_to_torque_and_bending(elasticity_modulus,moment_of_inertia_y, moment_of_inertia_z, twist_list, spanwise_locations, 0, shear_center_z, integral_values2_y, integral_values2_z, x_location_hinge1, x_location_hinge3, deflection_hinge_1, deflection_hinge_3)
+
+
+#print(twist_list)
+#print(lst_Deflections_y_and_z_respect_x)
+''''
+plt.title('twist versus span')
+plt.xlabel('span[m]')
+plt.ylabel('twist [rad]')
+plt.plot(spanwise_locations, twist_list)
+plt.show()
+
+print(twist_list)
+
+
+#PLOTTING
+y_deflects=[]
+z_deflects=[]
+for i in range(len(lst_Deflections_y_and_z_respect_x)):
+    y_deflects.append(lst_Deflections_y_and_z_respect_x[i][1])
+    z_deflects.append(lst_Deflections_y_and_z_respect_x[i][2])
+
+print(max(y_deflects))
+print(max(z_deflects))
+
+plt.title('y prime deflection versus span')
+plt.xlabel('span[m]')
+plt.ylabel('deflections [m]')
+plt.plot(spanwise_locations, y_deflects)
+plt.show()
+
+plt.title('z prime deflection versus span')
+plt.xlabel('span[m]')
+plt.ylabel('deflections [m]')
+plt.plot(spanwise_locations, z_deflects)
+plt.show()
+
+plt.title('twist versus span')
+plt.xlabel('span[m]')
+plt.ylabel('twist [rad]')
+plt.plot(spanwise_locations, twist_list)
+plt.show()
+
+#print(maximum_stress, member)
+
+#print(lst_Deflections_y_and_z_respect_x)
+#print(twist_list)
+#print(list(spanwise_locations))
+
+#print(maximum_stress, member)
+#print(lst_Deflections_y_and_z_respect_x)
+
+#print(twist_list)
+#print(list(spanwise_locations))
+'''
 
 
 
