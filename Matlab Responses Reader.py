@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 
 #CHANGE VARIABLE NAMES!!!!!!!
 
+#To retrieve a certain series of measurements:
+# reference_dataset()[i][j], where i is the index of the parameter and j is: [0] for parameter name, [1] for units,
+#[2] for array of measurements.
+
+
 mat = sio.loadmat("matlab.mat")
 
 def reference_dataset():
