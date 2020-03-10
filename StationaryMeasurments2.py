@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Mar  6 15:58:53 2020
 
-@author: Richelle
-"""
-
-import math as m 
-import numpy as np 
-import matplotlib.pyplot as plt
-#from scipy.optimize import curve_fit
+"Created on Fri Mar  6 15:58:53 2020"
+import numpy as np
+import math as m
 import pandas as pd
-
+import matplotlib.pyplot as plt
 "Import constants"
 S      = 30.00	          # wing area [m^2]
 Sh     = 0.2 * S         # stabiliser area [m^2]
@@ -37,20 +31,41 @@ engine_inlet_diameter = 0.686 #[m2]
 
 "inputs"
 # angle of attacks
-AOA=[1.7, 2.4, 3.6, 5.4, 8.7, 10.6] # from data sheet
-AOArad=[]
-title=Post_Flight_Datasheet_Flight_1_DD_12_3_2018
+
+title="Post_Flight_Datasheet_Flight_1_DD_12_3_2018.xlsx"
 file = pd.read_excel(title)
-file1 = file.to_numpy()    
-def valueimporter(row,col1,col2):
-    return file1[row][col1:col2]
+file1 = file.to_numpy()
+def valueimport2(row1,row2,col,file2):
+    for i in range(row1,row2+1):
+        file2.append(float(file1[i][col]))
+    return file2
+def degtorad(angledeg):
+    anglerad=angledeg*m.pi/180
+    return(anglerad)
+def lbstokg(lbs):
+    kg=lbs*0.45359237
+    return(kg)
+def weight_total(OEW, weight_fuel, weight_payload, fuel_used, g0):
+    weight_total = (OEW + weight_fuel + weight_payload - fuel_used) * g0
+    return(weight_total)
+def lift(weight):
+    lift=weight
+    print(lift)
+def IAStoCAS(IAS):
+    V_c=(IAS-2)*0.514444444
+    return(V_c)
+def fttom(hpft):
+    hpm=hpft*0.3048
+    return(hpm)
+IAS=[]
+IAS=valueimport2(26,31,4,IAS)
+AOA=[]
+AOA=valueimport2(26,31,5,AOA)
 "Transform angle of attack to radians"
-def AOAtoRad(AOA):
-    for i in AOA:
-        i=i*m.pi/180
-        AOArad.append(i)
-    return(AOArad)
-print(AOAtoRad(AOA))
+
+
+angle_of_attack=np.array(AOAtoRad(AOA))
+print(angle_of_attack[0])
 #alpha_1 = 1.7 * m.pi / 180 #degree to radians
 #alpha_2 = 2.4 * m.pi / 180 #degree to radians
 #alpha_3 = 3.6 * m.pi / 180 #degree to radians
@@ -64,6 +79,7 @@ OEW = 9165 * 0.45359237 #lbs to kg
 weight_fuel = 4050 * 0.45359237 #lbs to kg
 weight_payload = 695 #kg 
 g0 = 9.80665
+
 fuel_used1 = 360 * 0.45359237 #lbs to kg
 fuel_used2 = 412 * 0.45359237 #lbs to kg
 fuel_used3 = 447 * 0.45359237 #lbs to kg
@@ -78,7 +94,7 @@ weight_total3 = (OEW + weight_fuel + weight_payload - fuel_used3) * g0
 weight_total4 = (OEW + weight_fuel + weight_payload - fuel_used4) * g0
 weight_total5 = (OEW + weight_fuel + weight_payload - fuel_used5) * g0
 weight_total6 = (OEW + weight_fuel + weight_payload - fuel_used6) * g0
-
+print(weight_total1)
 "Calculate lift"
 lift1 = weight_total1
 lift2 = weight_total2
@@ -178,7 +194,8 @@ lift_coefficients = [lift_coefficient_1, lift_coefficient_2, lift_coefficient_3,
                      lift_coefficient_4, lift_coefficient_5, lift_coefficient_6]
 
 "Plot CL-alpha figure"
-x = np.array(angle_of_attack)
+
+x = angle_of_attack
 y = np.array(lift_coefficients)
 plt.plot(x, y, 'o', color='red', label='Measuring point')
 mo, bo = np.polyfit(x, y, 1)
@@ -197,24 +214,32 @@ print("Alpha_CL=0", zero_lift_angle_of_attack)
 print('CL_alpha:', mo)
 
 "Calculate thrust"
-Tp1 = 3678.46 + 3784.69
-Tp2 = 3007.55 + 3069.61
-Tp3 = 2410.92 + 2537.7
-Tp4 = 1873.55 + 2026.55
-Tp5 = 1903.04 + 2087.09
-Tp6 = 2220.99 +2418.08
-
+def thrust():
+    Tp1 = 3678.46 + 3784.69
+    Tp2 = 3007.55 + 3069.61
+    Tp3 = 2410.92 + 2537.7
+    Tp4 = 1873.55 + 2026.55
+    Tp5 = 1903.04 + 2087.09
+    Tp6 = 2220.99 +2418.08
+    Tp=np.array([Tp1,Tp2,Tp3,Tp4,Tp5,Tp6])
+    return(Tp)
+Tp=thrust()
 "Calculate drag"
-D1 = Tp1*np.cos(alpha_1)
-D2 = Tp2*np.cos(alpha_2)
-D3 = Tp3*np.cos(alpha_3)
-D4 = Tp4*np.cos(alpha_4)
-D5 = Tp5*np.cos(alpha_5)
-D6 = Tp6*np.cos(alpha_6)
+def drag(angle,Thrust):
+    Drag=[]
+    for i in range(0,6):
+        D=Tp[i]*np.cos(angle_of_attack[i])
+        Drag.append(D)
+    return(Drag)
+Drag=np.array(drag(angle_of_attack,Tp))
+
 
 "Caclulate drag coefficient"
+def dragcoeffiecient(drag,rho,TAS,S)
+    CD=drag,rho,TAS,S
+    return(CD)
 CD1 = D1 / (0.5*rho1*TAS1**2*S)
-CD2 = D2 / (0.5*rho2*TAS2**2*S)
+CD2 = D2 / (0.5*rho2*TAS2**2*S),
 CD3 = D3 / (0.5*rho3*TAS3**2*S)
 CD4 = D4 / (0.5*rho4*TAS4**2*S)
 CD5 = D5 / (0.5*rho5*TAS5**2*S)
