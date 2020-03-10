@@ -11,7 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 #from scipy.optimize import curve_fit
 import pandas as pd
-
+import pandas as pd
+print(pd.__version__)
 "Import constants"
 S      = 30.00	          # wing area [m^2]
 Sh     = 0.2 * S         # stabiliser area [m^2]
@@ -38,14 +39,18 @@ engine_inlet_diameter = 0.686 #[m2]
 "inputs"
 # angle of attacks
 AOA=[1.7, 2.4, 3.6, 5.4, 8.7, 10.6] # from data sheet
-AOArad=[]
-title=Post_Flight_Datasheet_Flight_1_DD_12_3_2018
+
+title= 'Post_Flight_Datasheet_Flight_1_DD_12_3_2018.xlsx'
 file = pd.read_excel(title)
 file1 = file.to_numpy()    
 def valueimporter(row,col1,col2):
-    return file1[row][col1:col2]
+    return file1[row][col1:(col2+1)]
+def valueimport2(row1,row2,col):
+    return file1[row1:(row2+1):col]
+print(valueimport2(26,31,5))
 "Transform angle of attack to radians"
 def AOAtoRad(AOA):
+    AOArad=[]
     for i in AOA:
         i=i*m.pi/180
         AOArad.append(i)
