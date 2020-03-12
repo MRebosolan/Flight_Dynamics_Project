@@ -357,10 +357,8 @@ def reducedV(rho,T, fuel_used,IAS,hp):
     Ve_bar = EAS * m.sqrt(standard_weight/weight_total)
     return Ve_bar
 V_E1=reducedV(rho1,T1,fuel_used1,249,hp1)
-print(V_E1)
-
 Ve_bar1 = EAS1 * m.sqrt(standard_weight / weight_total1)
-print(Ve_bar1)
+
 Ve_bar2 = EAS2 * m.sqrt(standard_weight / weight_total2)
 Ve_bar3 = EAS3 * m.sqrt(standard_weight / weight_total3)
 Ve_bar4 = EAS4 * m.sqrt(standard_weight / weight_total4)
