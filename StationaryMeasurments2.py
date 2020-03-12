@@ -346,19 +346,20 @@ oswald = 1 / (m.pi * A * dCD_dCL2)
 print('Oswald efficiency factor:', oswald)
 
 "Calculate reduced equivalent airspeed"
-def reducedV(rho,T, fuel_used,IAS,hp):
+def reducedV(rho,TAT, fuel_used,IAS,hp):
     p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
     weight_total = (OEW + weight_fuel + weight_payload - fuel_used) * g0
     V_c = (IAS - 2) * 0.514444444  # kts to m/s
     M = m.sqrt((2/0.4)*((1 + p0/p * ((1 + 0.4/2.8 *rho0/p0*V_c**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
+    T = (TAT+273.15) / (1 + 0.2 * M ** 2)
     a = m.sqrt(lambda_1 * R * T)
     TAS = M * a
     EAS = TAS * m.sqrt(rho/rho0)
     Ve_bar = EAS * m.sqrt(standard_weight/weight_total)
     return Ve_bar
-V_E1=reducedV(rho1,T1,fuel_used1,249,hp1)
+V_E1=reducedV(rho1,12.5,fuel_used1,249,hp1)
 Ve_bar1 = EAS1 * m.sqrt(standard_weight / weight_total1)
-
+print(V_E1, Ve_bar1)
 Ve_bar2 = EAS2 * m.sqrt(standard_weight / weight_total2)
 Ve_bar3 = EAS3 * m.sqrt(standard_weight / weight_total3)
 Ve_bar4 = EAS4 * m.sqrt(standard_weight / weight_total4)
