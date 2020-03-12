@@ -231,8 +231,9 @@ x_test = np.arange(-0.05,max(x),0.001)
 plt.title(r'$C_{L} - \alpha$')
 plt.xlabel(r'$\alpha$ [rad]')
 plt.ylabel('$C_{L} [-]$')
-plt.plot(x_test, mo*x_test + bo, color = 'black', label = 'Linear regression line')  
+plt.plot(x_test, mo*x_test + bo, color = 'black', label = 'Linear regression line')
 plt.legend()
+
 
 "Calculate intersection point for zero-lift angle of attack"
 zero_lift_angle_of_attack = -bo/mo
@@ -257,12 +258,12 @@ def drag(angle,Thrust):
         D=Tp[i]
         Drag.append(D)
     return(Drag)
-D1 = Tp1*np.cos(alpha_1)
-D2 = Tp2*np.cos(alpha_2)
-D3 = Tp3*np.cos(alpha_3)
-D4 = Tp4*np.cos(alpha_4)
-D5 = Tp5*np.cos(alpha_5)
-D6 = Tp6*np.cos(alpha_6)
+D1 = Tp1
+D2 = Tp2
+D3 = Tp3
+D4 = Tp4
+D5 = Tp5
+D6 = Tp6
 
 "Caclulate drag coefficient"
 def dragcoeffiecient(drag,rho,TAS,S):
@@ -287,6 +288,7 @@ plt.title(r'$C_{D} - \alpha$')
 plt.xlabel(r'$\alpha$ [rad]')
 plt.ylabel('$C_{D} [-]$')
 plt.plot(r_test, h + g*r_test + f*r_test**2, color = 'black', label = '2nd order polynomial')
+
 plt.legend()
 
 "Plot CL-CD figure"
@@ -316,6 +318,7 @@ plt.title('$C_{L}^2 - C_{D}$')
 plt.xlabel('$C_{L}^2 [-]$')
 plt.ylabel('$C_{D} [-]$')
 plt.plot(d_test, g*d_test + v, color = 'black', label = 'Linear regression line')
+plt.show()
 plt.legend()
 
 "Print dCL^2_dCD and CD0"
