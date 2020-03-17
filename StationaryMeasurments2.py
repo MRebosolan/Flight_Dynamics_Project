@@ -9,9 +9,9 @@ Created on Fri Mar  6 15:58:53 2020
 import math as m 
 import numpy as np 
 import matplotlib.pyplot as plt
-#from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit
 import pandas as pd
-import pandas as pd
+
 print(pd.__version__)
 "Import constants"
 S      = 30.00	          # wing area [m^2]
@@ -40,14 +40,14 @@ engine_inlet_diameter = 0.686 #[m2]
 # angle of attacks
 AOA=[1.7, 2.4, 3.6, 5.4, 8.7, 10.6] # from data sheet
 
-title= 'Post_Flight_Datasheet_Flight_1_DD_12_3_2018.xlsx'
-file = pd.read_excel(title)
-file1 = file.to_numpy()    
-def valueimporter(row,col1,col2):
-    return file1[row][col1:(col2+1)]
-def valueimport2(row1,row2,col):
-    return file1[row1:(row2+1):col]
-print(valueimport2(26,31,5))
+#title= 'Post_Flight_Datasheet_Flight_1_DD_12_3_2018.xlsx'
+#file = pd.read_excel(title)
+#file1 = file.to_numpy()    
+#def valueimporter(row,col1,col2):
+#    return file1[row][col1:(col2+1)]
+#def valueimport2(row1,row2,col):
+#    return file1[row1:(row2+1):col]
+#print(valueimport2(26,31,5))
 "Transform angle of attack to radians"
 def AOAtoRad(AOA):
     AOArad=[]
@@ -55,14 +55,14 @@ def AOAtoRad(AOA):
         i=i*m.pi/180
         AOArad.append(i)
     return(AOArad)
-print(AOAtoRad(AOA))
-#alpha_1 = 1.7 * m.pi / 180 #degree to radians
-#alpha_2 = 2.4 * m.pi / 180 #degree to radians
-#alpha_3 = 3.6 * m.pi / 180 #degree to radians
-#alpha_4 = 5.4 * m.pi / 180 #degree to radians
-#alpha_5 = 8.7 * m.pi / 180 #degree to radians
-#alpha_6 = 10.6 * m.pi / 180 #degree to radians
-#angle_of_attack = [alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6]
+
+alpha_1 = 1.7 * m.pi / 180 #degree to radians
+alpha_2 = 2.4 * m.pi / 180 #degree to radians
+alpha_3 = 3.6 * m.pi / 180 #degree to radians
+alpha_4 = 5.4 * m.pi / 180 #degree to radians
+alpha_5 = 8.7 * m.pi / 180 #degree to radians
+alpha_6 = 10.6 * m.pi / 180 #degree to radians
+angle_of_attack = [alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6]
 
 "Calculate total weight at each measure point"
 OEW = 9165 * 0.45359237 #lbs to kg
