@@ -5,6 +5,21 @@ import control as control
 import pandas as pd
 #Asymmetric flight
 from scipy.io import loadmat
+p0 = 101325 #pa
+rho0 = 1.225 #kg/m3
+T0 = 288.15 #K
+lambda_1 = 1.4 #ratio of heats
+lambda0 = -0.0065 #K/m
+R = 287 #J/kg*K
+mu0 = 1.7894*10**(-5) #kg/m*s
+OEW = 9165 * 0.45359237 #lbs to kg     CHECK!!!weights
+weight_fuel = 4050 * 0.45359237 #lbs to kg
+weight_payload = 695 #kg 
+g0 = 9.80665
+
+weight_payloadFL = 733 #kg
+weight_fuelEIG = 2750*0.45359237 #lbs to kg
+
 Flightdata = loadmat('FTISxprt-20200310_flight4.mat')
 #Weight
 data = [[row.flat[0] for row in line] for line in Flightdata['flightdata'][0]]
@@ -56,12 +71,18 @@ p_FL = pflight[:,0]
 rflight = np.array(DATA[0][28][0])
 r_FL = rflight[:,0]
 
+fuel_right_usedflight = np.array(DATA[0][15][0])
+fuel_right_used_FL = fuel_right_usedflight[:,0]
+
+fuel_left_usedflight = np.array(DATA[0][14][0])
+fuel_left_used_FL = fuel_left_usedflight[:,0]
+
 #For plotting
-t_DutchRoll = 3164  #CHECKED 3164
-t_spiral = 3280    #tbd
-t_aperiodic = 3040   #tbd
-t_phugoid = 2812   #CHECKED 2812
-t_shortper = 2982   #CHECKED2982  tbd..
+t_DutchRoll = 3163  #CHECKED 3164
+t_spiral = 3315    #tbd
+t_aperiodic = 3091   #tbd
+t_phugoid = 2812   #CHECKED 2815 for the data
+t_shortper = 2979   #
 
 
 for i in range(20000,len(timesFL)):
@@ -83,18 +104,25 @@ for i in range(20000,len(timesFL)):
 #t_lenshortper = 
 #t_lenphugoid = 
 #adjust time interval depending on current index
-
-current_index = phugoid_index  #INPUT        
-if current_index == phugoid_index:
+######################################
+current_index = phugoid_index  #INPUT
+#################################        
+if current_index == phugoid_index or current_index==spiral_index:
     time_eigenmotion = 150         #INPUT
-if current_index == shortper_index or current_index == spiral_index or current_index==DutchRoll_index:
-    time_eigenmotion = 30 #actually 8 and 15
+if current_index == shortper_index:
+    time_eigenmotion = 8 
+if current_index==DutchRoll_index or current_index==aperiodic_index:
+    time_eigenmotion = 20
 
 de_raw = de_FL[current_index: current_index + time_eigenmotion*10]        
-de = pi/180*de_raw.reshape(time_eigenmotion*10) #- de_raw[0]*pi/180
+de = pi/180*(de_raw - de_raw[0]) #- de_raw[0]*pi/180
 
-da = pi/180*da_FL[current_index: current_index + time_eigenmotion*10] 
-dr = pi/180*dr_FL[current_index: current_index + time_eigenmotion*10] 
+da_raw = da_FL[current_index: current_index + time_eigenmotion*10] 
+dr_raw = dr_FL[current_index: current_index + time_eigenmotion*10] 
+
+da=pi/180*(da_raw-da_raw[0])
+dr=pi/180*(dr_raw - dr_raw[0])
+
 times = timesFL[current_index: current_index + time_eigenmotion*10]
 
 alpha_raw = alpha_FL[current_index: current_index + time_eigenmotion*10]
@@ -109,6 +137,7 @@ q_raw = q_FL[current_index: current_index + time_eigenmotion*10]
 qFL = pi/180*(q_raw-q_raw[0])
 
 phi_raw = phi_FL[current_index: current_index + time_eigenmotion*10]
+#phi = pi/180*(phi_raw.reshape(time_eigenmotion*10))
 phi = pi/180*(phi_raw - phi_raw[0])
 
 p_raw = p_FL[current_index: current_index + time_eigenmotion*10]
@@ -126,7 +155,15 @@ V_tas = (V_tas_raw.reshape(time_eigenmotion*10))
 V0 = V_tas_FL[current_index]
 alt = alt_FL[current_index]
 Mach = Mach_FL[current_index]
-tat = tat_FL[current_index]
+tat = tat_FL[current_index]+273.15
+pressureFL = p0 * (1 + (lambda0*alt)/T0)**(-g0/(lambda0*R))
+TFL = tat/ (1+0.2*Mach**2)
+
+rhoFL = pressureFL/R/TFL
+
+fuel_used_FL = 0.45359237*(fuel_right_used_FL[current_index] + fuel_left_used_FL[current_index]) 
+weight_totalFL = (OEW + weight_fuelEIG + weight_payloadFL - fuel_used_FL) * g0
+
 #aileron, rudder deflections /these lines mby not needed
 aileron = pi/180*da.reshape(time_eigenmotion*10) - da[0]*pi/180
 rudder = pi/180*dr.reshape(time_eigenmotion*10) - dr[0]*pi/180
@@ -154,11 +191,9 @@ V_tas2=(V_tas-V_tas[0])/V_tas[0]
 '''
 plt.figure()
 plt.title('elevator/rudder/aileron')
-plt.plot(t_shaped, dr)
 plt.plot(t_shaped, da)
+plt.plot(t_shaped, da_raw)
 
-
-V_tas2=(V_tas-V_tas[0])/V_tas[0]
 #plt.figure()
 #plt.plot(t_shaped, beta)
 #plt.show()

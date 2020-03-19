@@ -3,24 +3,24 @@ import numpy as np
 from matplotlib import pyplot as plt
 import control as control
 from control.matlab import lsim
-from flight_data_reading import phi,p,r, alphaFL, thetaFL, qFL, V_tas2, alpha_0, theta_0,de,da,dr,times, time_eigenmotion, INIT_s, INIT_a, t_shaped, V0
+from flight_data_reading import weight_totalFL, rhoFL,phi,p,r, alphaFL, thetaFL, qFL, V_tas2, alpha_0, theta_0,de,da,dr,times, time_eigenmotion, INIT_s, INIT_a, t_shaped, V0
 from scipy.interpolate import griddata 
-from StationaryMeasurements import weight_totalPH, rhoFL
+
 #Asymmetric flight
 pFL=p
 rFL=r
 phiFL=phi
 #velocity  
 V=V0         #INPUTS
-V=104.7832256327374         #TAS
+#104.7832256327374         #TAS
 theta0=theta_0
 #alpha0=0
 #aircraft dimensions
 S=30  #m^2
 c = 2.0569  #m
 b = 15.911 #m
-rho=1.061626963061385#Weigh   #INPUT
-W=63610.51533364605         #INPUT
+rho=rhoFL#Weigh   #INPUT
+W=weight_totalFL        #INPUT
 m=W/9.80665
 #m=13600*0.45359237
 mju_b = m/(rho*S*b)#7000*2*V/b
@@ -46,7 +46,7 @@ xcg=0.25*c
 #Stability derivatives
 #Assymetric
 #Lateral force derivatives
-CY_b=-0.75
+CY_b=-0.75         #DR -0.75
 CY_bdot = 0
 CY_p = -0.0304
 CY_r = 0.8495
@@ -62,7 +62,7 @@ Cl_dr = 0.0344
 Cn_b = 0.1348
 Cn_bdot = 0
 Cn_p = -0.0602
-Cn_r = -0.2061
+Cn_r = -0.2061   #DR -0.2061
 Cn_da = -0.0120
 Cn_dr = -0.0939
 
@@ -277,13 +277,18 @@ UA=np.zeros((len(da_list),2))
 for rr in range(len(da_list)):
     UA[rr,0] = da_list[rr]
     UA[rr,1] = dr_list[rr]
+UA2=np.zeros((len(da),2))
+for rr in range(len(da)):
+    UA2[rr,0] = da[rr]
+    UA2[rr,1] = dr[rr]   
+    
 yout,Ts,xout = control.matlab.lsim(sys_Sym, de_list, t, INIT_s)
-youta,Ta,xouta = control.matlab.lsim(sys_Ass, UA, t, INIT_a)
+youta,Ta,xouta = control.matlab.lsim(sys_Ass, -UA, t, INIT_a)
 
-plt.figure()
-plt.title('simulation')
-plt.plot(Ta,youta[:,1])
-plt.show()
+#plt.figure()
+#plt.title('simulation')
+#plt.plot(Ta,youta[:,1])
+#plt.show()
 
 #a2=pi/180*(np.array(alpha))
 #theta2=pi/180*(np.array(theta))
@@ -291,13 +296,14 @@ plt.show()
 plt.figure()
 plt.title('elevator')
 plt.plot(t,de_list)
+plt.plot(t_shaped,de)
 plt.figure()
 plt.title('velocity')
 plt.plot(t,u)
 plt.plot(t_shaped,V_tas2)
 plt.figure()
 plt.title('roll, AoA')
-plt.plot(t,alpha)
+plt.plot(Ta,alpha)
 plt.plot(t_shaped,alphaFL)
 plt.figure()
 plt.title('RollRate, pitch')
