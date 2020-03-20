@@ -24,20 +24,15 @@ rho0 = 1.225 #kg/m3
 T0 = 288.15 #K
 lambda_1 = 1.4 #ratio of heats
 lambda0 = -0.0065 #K/m
+lambda_r=2.6 #bypass ratio
 R = 287 #J/kg*K
 mu0 = 1.7894*10**(-5) #kg/m*s
 standard_weight = 60500 #Standard weight [N]
 engine_inlet_diameter = 0.686 #[m2]
-
-"Calculate total weight at each measure point"
-OEW = 9165 * 0.45359237 #lbs to kg
-weight_fuel = 4050 * 0.45359237 #lbs to kg
-weight_payload = 695 #kg
-g0 = 9.80665
 "inputs"
-# angle of attacks
 
-title="Post_Flight_Datasheet_Flight_1_DD_12_3_2018.xlsx"
+
+title="20200310_V4.xlsx" #write import file
 file = pd.read_excel(title)
 file1 = file.to_numpy()
 def valueimport2(row1,row2,col,file2):
@@ -46,53 +41,53 @@ def valueimport2(row1,row2,col,file2):
     return file2
 IAS=[]
 IAS=valueimport2(26,31,4,IAS)
-AOA=[]
-AOA=valueimport2(26,31,5,AOA)
+angle_of_attack=[]
+angle_of_attack=valueimport2(26,31,5,angle_of_attack)
 "Transform angle of attack to radians"
-
 def degtorad(angledeg):
-    aoa=[]
-    for i in angledeg:
-        anglerad=i*m.pi/180
-        aoa.append(anglerad)
-    return(aoa)
-
-angle_of_attack0=np.array(degtorad(AOA))
-
-alpha_1 = 1.7 * m.pi / 180 #degree to radians
-alpha_2 = 2.4 * m.pi / 180 #degree to radians
-alpha_3 = 3.6 * m.pi / 180 #degree to radians
-alpha_4 = 5.4 * m.pi / 180 #degree to radians
-alpha_5 = 8.7 * m.pi / 180 #degree to radians
-alpha_6 = 10.6 * m.pi / 180 #degree to radians
-angle_of_attack = [alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6]
-
+    return angledeg*m.pi/180
+for i in range(6):
+    angle_of_attack[i]=degtorad(angle_of_attack[i])
+alpha_1 = angle_of_attack[0]
+alpha_2 = angle_of_attack[1]
+alpha_3 = angle_of_attack[2]
+alpha_4 = angle_of_attack[3]
+alpha_5 = angle_of_attack[4]
+alpha_6 = angle_of_attack[5]
 
 def lbstokg(lbs):
-    kg=lbs*0.45359237
-    return(kg)
-fuel_used1 = 360 * 0.45359237 #lbs to kg
-fuel_used2 = 412 * 0.45359237 #lbs to kg
-fuel_used3 = 447 * 0.45359237 #lbs to kg
-fuel_used4 = 478 * 0.45359237 #lbs to kg
-fuel_used5 = 532 * 0.45359237 #lbs to kg
-fuel_used6 = 570 * 0.45359237 #lbs to kg
+    return lbs*0.45359237
+OEW = lbstokg(9165)
+weight_fuel=[]
+weight_fuel = lbstokg(sum((valueimport2(16,16,3,weight_fuel))))
+weight_payload=[]
+weight_payload=sum(valueimport2(6,14,7,weight_payload))
+g0 = 9.80665
+
+fuel_used=[]
+fuel_used=valueimport2(26,31,8,fuel_used)
+for i in range(6):
+    fuel_used[i]=lbstokg(fuel_used[i])
 
 "Calculate weight"
-def weight_total(OEW, weight_fuel, weight_payload, fuel_used, g0):
-    weight_total = (OEW + weight_fuel + weight_payload - fuel_used) * g0
-    return(weight_total)
-weight_total1 = (OEW + weight_fuel + weight_payload - fuel_used1) * g0
-weight_total2 = (OEW + weight_fuel + weight_payload - fuel_used2) * g0
-weight_total3 = (OEW + weight_fuel + weight_payload - fuel_used3) * g0
-weight_total4 = (OEW + weight_fuel + weight_payload - fuel_used4) * g0
-weight_total5 = (OEW + weight_fuel + weight_payload - fuel_used5) * g0
-weight_total6 = (OEW + weight_fuel + weight_payload - fuel_used6) * g0
-print(weight_total1)
+def total_weight(fuel_used):
+    return (OEW + weight_fuel + weight_payload - fuel_used) * g0
+weight_total=[]
+for i in fuel_used:
+    weight_total.append(total_weight(i))
+print(weight_total[5])
+weight_total1 = weight_total[0]
+weight_total2 = weight_total[1]
+weight_total3 = weight_total[2]
+weight_total4 = weight_total[3]
+weight_total5 = weight_total[4]
+weight_total6 = weight_total[5]
+
 "Calculate lift"
 def lift(weight):
-    lift=weight
-    return lift
+    return weight
+lift=weight_total
+print(lift)
 lift1 = weight_total1
 lift2 = weight_total2
 lift3 = weight_total3
@@ -105,22 +100,23 @@ def IAStoCAS(IAS):
     V_c=(IAS-2)*0.514444444
     return(V_c)
 V_c1 = (249 - 2) * 0.514444444 #kts to m/s
-V_c2 = (221 - 2) * 0.514444444 #kts to m/s
-V_c3 = (192 - 2) * 0.514444444 #kts to m/s
-V_c4 = (163 - 2) * 0.514444444 #kts to m/s
-V_c5 = (130 - 2) * 0.514444444 #kts to m/s
-V_c6 = (118 - 2) * 0.514444444 #kts to m/s
+V_c2 = (219 - 2) * 0.514444444 #kts to m/s
+V_c3 = (193 - 2) * 0.514444444 #kts to m/s
+V_c4 = (160 - 2) * 0.514444444 #kts to m/s
+V_c5 = (131 - 2) * 0.514444444 #kts to m/s
+V_c6 = (113 - 2) * 0.514444444 #kts to m/s
 
 "Transform height to m"
 def fttom(hpft):
     hpm=hpft*0.3048
     return(hpm)
-hp1 = 5010 * 0.3048 #ft to m
-hp2 = 5020 * 0.3048 #ft to m
-hp3 = 5020 * 0.3048 #ft to m
-hp4 = 5030 * 0.3048 #ft to m
-hp5 = 5020 * 0.3048 #ft to m
-hp6 = 5110 * 0.3048 #ft to m
+hp1 = 6990 * 0.3048 #ft to m
+hp2 = 6990 * 0.3048 #ft to m
+hp3 = 7000 * 0.3048 #ft to m
+hp4 = 6960 * 0.3048 #ft to m
+hp5 = 6950 * 0.3048 #ft to m
+hp6 = 7000 * 0.3048 #ft to m
+hp = [hp1, hp2, hp3, hp4, hp5, hp6]
 
 "Calculate pressure at specific heights"
 def pressure(p0,lambda0,hp,T0,g0,R):
@@ -138,23 +134,23 @@ def mach(p0,p,rho0,V,lambda_1):
     M=m.sqrt((2/(1-lambda_1))*((1 + p0/p1 * ((1 + (1-lambda_1)/(2*lambda_1)*rho0/p0*V_c1**2)**(lambda_1/(1-lambda_1))-1))**((1-lambda_1)/lambda_1) -1))
     return M
 M1 = m.sqrt((2/0.4)*((1 + p0/p1 * ((1 + 0.4/2.8 *rho0/p0*V_c1**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
-print(M1)
+
 M2 = m.sqrt((2/0.4)*((1 + p0/p2 * ((1 + 0.4/2.8 *rho0/p0*V_c2**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
 M3 = m.sqrt((2/0.4)*((1 + p0/p3 * ((1 + 0.4/2.8 *rho0/p0*V_c3**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
 M4 = m.sqrt((2/0.4)*((1 + p0/p4 * ((1 + 0.4/2.8 *rho0/p0*V_c4**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
 M5 = m.sqrt((2/0.4)*((1 + p0/p5 * ((1 + 0.4/2.8 *rho0/p0*V_c5**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
 M6 = m.sqrt((2/0.4)*((1 + p0/p6 * ((1 + 0.4/2.8 *rho0/p0*V_c6**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
-
+print(M1, M2, M3, M4, M5, M6)
 "Measured total temperature"
 def TemptoK(T):
     TAT=T+273.15
     return TAT
-TAT1 = 12.5 + 273.15 #Celsius to Kelvin
-TAT2 = 10.5 + 273.15 #Celsius to Kelvin
-TAT3 = 8.8 + 273.15 #Celsius to Kelvin
-TAT4 = 7.2 + 273.15 #Celsius to Kelvin
-TAT5 = 6 + 273.15 #Celsius to Kelvin
-TAT6 = 5.2 + 273.15 #Celsius to Kelvin
+TAT1 = 13.2 + 273.15 #Celsius to Kelvin
+TAT2 = 11.2 + 273.15 #Celsius to Kelvin
+TAT3 = 9.2 + 273.15 #Celsius to Kelvin
+TAT4 = 7.8 + 273.15 #Celsius to Kelvin
+TAT5 = 6.5 + 273.15 #Celsius to Kelvin
+TAT6 = 5.8 + 273.15 #Celsius to Kelvin
 
 "Converting total temperature to normal temperature"
 def normTemp(TAT,M):
@@ -199,6 +195,7 @@ rho3 = p3/(R*T3)
 rho4 = p4/(R*T4)
 rho5 = p5/(R*T5)
 rho6 = p6/(R*T6)
+print(rho1)
 
 "Caclulate equivalent airspeed"
 def EAS(TAS,rho,rho0):
@@ -218,7 +215,7 @@ lift_coefficient_3 = lift3 / (0.5*rho3*TAS3**2*S)
 lift_coefficient_4 = lift4 / (0.5*rho4*TAS4**2*S)
 lift_coefficient_5 = lift5 / (0.5*rho5*TAS5**2*S)
 lift_coefficient_6 = lift6 / (0.5*rho6*TAS6**2*S)
-lift_coefficients = [lift_coefficient_1, lift_coefficient_2, lift_coefficient_3, 
+lift_coefficients = [lift_coefficient_1, lift_coefficient_2, lift_coefficient_3,
                      lift_coefficient_4, lift_coefficient_5, lift_coefficient_6]
 
 "Plot CL-alpha figure"
@@ -243,12 +240,12 @@ print("Alpha_CL=0", zero_lift_angle_of_attack)
 print('CL_alpha:', mo)
 
 "Calculate thrust"
-Tp1 = 3678.46 + 3784.69
-Tp2 = 3007.55 + 3069.61
-Tp3 = 2410.92 + 2537.7
-Tp4 = 1873.55 + 2026.55
-Tp5 = 1903.04 + 2087.09
-Tp6 = 2220.99 +2418.08
+Tp1 = 3475.18 +	3773.6
+Tp2 = 2645.67 + 2913.04
+Tp3 = 2244.59 +	2488.8
+Tp4 = 1707.67 + 1976.26
+Tp5 = 1708.71 +	1921.07
+Tp6 = 1901.78 +	2216.83
 Tp=[Tp1,Tp2,Tp3,Tp4,Tp5,Tp6]
 
 "Calculate drag"
@@ -318,7 +315,6 @@ plt.title('$C_{L}^2 - C_{D}$')
 plt.xlabel('$C_{L}^2 [-]$')
 plt.ylabel('$C_{D} [-]$')
 plt.plot(d_test, g*d_test + v, color = 'black', label = 'Linear regression line')
-plt.show()
 plt.legend()
 
 "Print dCL^2_dCD and CD0"
@@ -342,27 +338,31 @@ Re5 = (rho5*TAS5*chord) / mu5 / 10**6
 Re6 = (rho6*TAS6*chord) / mu6 / 10**6
 reynolds_number = [Re1, Re2, Re3, Re4, Re5, Re6]
 
-dCD_dCL2 = g #slope of CD-CL^2 plot 
+dCD_dCL2 = g #slope of CD-CL^2 plot
 
 "Calculate Oswald efficiency factor"
 oswald = 1 / (m.pi * A * dCD_dCL2)
 print('Oswald efficiency factor:', oswald)
 
 "Calculate reduced equivalent airspeed"
-def reducedV(rho,TAT, fuel_used,IAS,hp):
+def reducedV(TAT, fuel_used,IAS,hp):
     p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
-    weight_total = (OEW + weight_fuel + weight_payload - fuel_used) * g0
+    weight_total = total_weight(fuel_used)
     V_c = (IAS - 2) * 0.514444444  # kts to m/s
     M = m.sqrt((2/0.4)*((1 + p0/p * ((1 + 0.4/2.8 *rho0/p0*V_c**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
     T = (TAT+273.15) / (1 + 0.2 * M ** 2)
     a = m.sqrt(lambda_1 * R * T)
+    rho = p / (R * T)
     TAS = M * a
     EAS = TAS * m.sqrt(rho/rho0)
     Ve_bar = EAS * m.sqrt(standard_weight/weight_total)
+    print(rho1)
     return Ve_bar
-V_E1=reducedV(rho1,12.5,fuel_used1,249,hp1)
+V_E1=reducedV(13.2,fuel_used[0],249,hp1)
 Ve_bar1 = EAS1 * m.sqrt(standard_weight / weight_total1)
 print(V_E1, Ve_bar1)
+
+
 Ve_bar2 = EAS2 * m.sqrt(standard_weight / weight_total2)
 Ve_bar3 = EAS3 * m.sqrt(standard_weight / weight_total3)
 Ve_bar4 = EAS4 * m.sqrt(standard_weight / weight_total4)
@@ -384,3 +384,4 @@ delta_t3 = T3 - (T0 + lambda0 * hp3)
 delta_t4 = T4 - (T0 + lambda0 * hp4)
 delta_t5 = T5 - (T0 + lambda0 * hp5)
 delta_t6 = T6 - (T0 + lambda0 * hp6)
+print(delta_t1)
