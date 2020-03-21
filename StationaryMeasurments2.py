@@ -7,6 +7,7 @@ import math as m
 import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
+import csv
 
 "Import constants"
 S      = 30.00	          # wing area [m^2]
@@ -281,37 +282,24 @@ valueimport2(26,31,6,FFl)
 FFr=[]
 valueimport2(26,31,7,FFr)
 matlab=[]
-f = open("matlab.dat", 'w+')
-for row in matlab:
-    for item in row:
-        f.write(str(item) + " ")
-    f.write("\n")#Nieuwe regel
-
-f.close()
-command="thrust(1)"
-os.system(command)
+def lbshrtokgs(FuelFlow):
+    return lbstokg(FuelFlow)/3600
 
 for i in range(6):
-    lol=hp[i], M[i], delta_t[i], FFl[i], FFr[i]
+    lol=hp[i], M[i], delta_t[i], lbshrtokgs(FFl[i]), lbshrtokgs(FFr[i])
     matlab.append(lol)
-print(np.array(matlab)) # copy paste this in matlab.data to get the thrusts
+
 f = open("matlab.dat", 'w+')
 for row in matlab:
     for item in row:
         f.write(str(item) + " ")
     f.write("\n")#Nieuwe regel
 f.close()
-subprocess.Popen([r"C:\Users\lizzy\OneDrive\Documenten\Universiteit\2019-2020\SVV\Flight_Dynamics_Project"])
-
-"Calculate thrust"
-Tp1 = 3475.18 +	3773.6
-Tp2 = 2645.67 + 2913.04
-Tp3 = 2244.59 +	2488.8
-Tp4 = 1707.67 + 1976.26
-Tp5 = 1708.71 +	1921.07
-Tp6 = 1901.78 +	2216.83
-thrust=[Tp1,Tp2,Tp3,Tp4,Tp5,Tp6]
-
+subprocess.Popen([r"C:\Users\lizzy\OneDrive\Documenten\Universiteit\2019-2020\SVV\Flight_Dynamics_Project\thrust(1).exe"])
+data = np.genfromtxt("thrust.dat")
+thrust=[]
+for i in range(6):
+    thrust.append(sum(data[i]))
 
 "Caclulate drag coefficient"
 def dragcoeffiecient(thrust,hp,IAS,T_org):
@@ -397,39 +385,38 @@ reynolds_number = [Re1, Re2, Re3, Re4, Re5, Re6]
 dCD_dCL2 = g #slope of CD-CL^2 plot
 
 "Calculate Oswald efficiency factor"
-print("a",A)
+
 oswald = 1 / (m.pi * A * dCD_dCL2)
 print('Oswald efficiency factor:', oswald)
 
 "Calculate reduced equivalent airspeed"
-def reducedV(TAT, fuel_used,IAS,hp):
+def reducedV(T_org, fuel_used,IAS,hp):
     p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
     weight_total = total_weight(fuel_used)
     V_c = (IAS - 2) * 0.514444444  # kts to m/s
     M = m.sqrt((2/0.4)*((1 + p0/p * ((1 + 0.4/2.8 *rho0/p0*V_c**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
-    T = (TAT+273.15) / (1 + 0.2 * M ** 2)
+    T = (T_org+273.15) / (1 + 0.2 * M ** 2)
     a = m.sqrt(gamma * R * T)
     rho = p / (R * T)
     TAS = M * a
     EAS = TAS * m.sqrt(rho/rho0)
     Ve_bar = EAS * m.sqrt(standard_weight/weight_total)
-    print(rho1)
     return Ve_bar
-V_E1=reducedV(13.2,fuel_used[0],249,hp1)
-Ve_bar1 = EAS1 * m.sqrt(standard_weight / weight_total1)
-print(V_E1, Ve_bar1)
-
-
-Ve_bar2 = EAS2 * m.sqrt(standard_weight / weight_total2)
-Ve_bar3 = EAS3 * m.sqrt(standard_weight / weight_total3)
-Ve_bar4 = EAS4 * m.sqrt(standard_weight / weight_total4)
-Ve_bar5 = EAS5 * m.sqrt(standard_weight / weight_total5)
-Ve_bar6 = EAS6 * m.sqrt(standard_weight / weight_total6)
+Ve_bar=[]
+for i in range(6):
+    Ve_bar.append(reducedV(T_org[i],fuel_used[i],IAS[i],hp[i]))
 
 "Calculate standard thrust"
-standard_thrust1 = Tp1 / (0.5 * rho1 * Ve_bar1 * 2 * engine_inlet_diameter)
-standard_thrust2 = Tp2 / (0.5 * rho2 * Ve_bar2 * 2 * engine_inlet_diameter)
-standard_thrust3 = Tp3 / (0.5 * rho3 * Ve_bar3 * 2 * engine_inlet_diameter)
-standard_thrust4 = Tp4 / (0.5 * rho4 * Ve_bar4 * 2 * engine_inlet_diameter)
-standard_thrust5 = Tp5 / (0.5 * rho5 * Ve_bar5 * 2 * engine_inlet_diameter)
-standard_thrust6 = Tp6 / (0.5 * rho6 * Ve_bar6 * 2 * engine_inlet_diameter)
+def stanthrust(thrust,hp,IAS,T_org,fuel_used):
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444  # kts to m/s
+    M = m.sqrt(
+        (2 / 0.4) * ((1 + p0 / p * ((1 + 0.4 / 2.8 * rho0 / p0 * V_c ** 2) ** (1.4 / 0.4) - 1)) ** (0.4 / 1.4) - 1))
+    T = (T_org + 273.15) / (1 + 0.2 * M ** 2)
+    rho = p / (R * T)
+    Ve_bar=reducedV(T_org, fuel_used,IAS,hp)
+    return thrust / (0.5 * rho * Ve_bar * 2 * engine_inlet_diameter)
+standard_thrust=[]
+for i in range(6):
+    standard_thrust.append(stanthrust(thrust[i],hp[i],IAS[i],T_org[i],fuel_used[i]))
+
