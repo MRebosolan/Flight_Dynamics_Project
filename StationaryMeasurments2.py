@@ -6,6 +6,9 @@ import numpy as np
 import math as m
 import pandas as pd
 import matplotlib.pyplot as plt
+import subprocess
+import csv
+
 "Import constants"
 S      = 30.00	          # wing area [m^2]
 Sh     = 0.2 * S         # stabiliser area [m^2]
@@ -22,7 +25,7 @@ ih     = -2 * m.pi / 180   # stabiliser angle of incidence [rad]
 p0 = 101325 #pa
 rho0 = 1.225 #kg/m3
 T0 = 288.15 #K
-lambda_1 = 1.4 #ratio of heats
+gamma = 1.4 #ratio of heats
 lambda0 = -0.0065 #K/m
 lambda_r=2.6 #bypass ratio
 R = 287 #J/kg*K
@@ -39,8 +42,7 @@ def valueimport2(row1,row2,col,file2):
     for i in range(row1,row2+1):
         file2.append(float(file1[i][col]))
     return file2
-IAS=[]
-IAS=valueimport2(26,31,4,IAS)
+
 angle_of_attack=[]
 angle_of_attack=valueimport2(26,31,5,angle_of_attack)
 "Transform angle of attack to radians"
@@ -96,6 +98,8 @@ lift5 = weight_total5
 lift6 = weight_total6
 
 "Transform IAS to CAS"
+IAS=[]
+IAS=valueimport2(26,31,4,IAS)
 def IAStoCAS(IAS):
     V_c=(IAS-2)*0.514444444
     return(V_c)
@@ -107,17 +111,19 @@ V_c5 = (131 - 2) * 0.514444444 #kts to m/s
 V_c6 = (113 - 2) * 0.514444444 #kts to m/s
 
 "Transform height to m"
-def fttom(hpft):
-    hpm=hpft*0.3048
-    return(hpm)
+hp=[]
+valueimport2(26,31,3,hp)
+def fttom(hp):
+    return hp*0.3048
+for i in range(6):
+    hp[i]=fttom(hp[i])
+hp=np.array(hp)
 hp1 = 6990 * 0.3048 #ft to m
 hp2 = 6990 * 0.3048 #ft to m
 hp3 = 7000 * 0.3048 #ft to m
 hp4 = 6960 * 0.3048 #ft to m
 hp5 = 6950 * 0.3048 #ft to m
 hp6 = 7000 * 0.3048 #ft to m
-hp = [hp1, hp2, hp3, hp4, hp5, hp6]
-
 "Calculate pressure at specific heights"
 def pressure(p0,lambda0,hp,T0,g0,R):
     p=p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
@@ -130,7 +136,7 @@ p5 = p0 * (1 + (lambda0*hp5)/T0)**(-g0/(lambda0*R))
 p6 = p0 * (1 + (lambda0*hp6)/T0)**(-g0/(lambda0*R))
 
 "Calculate Mach number at each measure point"
-def mach(p0,p,rho0,V,lambda_1):
+def mach(p,V_c):
     M=m.sqrt((2/(1-lambda_1))*((1 + p0/p1 * ((1 + (1-lambda_1)/(2*lambda_1)*rho0/p0*V_c1**2)**(lambda_1/(1-lambda_1))-1))**((1-lambda_1)/lambda_1) -1))
     return M
 M1 = m.sqrt((2/0.4)*((1 + p0/p1 * ((1 + 0.4/2.8 *rho0/p0*V_c1**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
@@ -142,6 +148,9 @@ M5 = m.sqrt((2/0.4)*((1 + p0/p5 * ((1 + 0.4/2.8 *rho0/p0*V_c5**2)**(1.4/0.4)-1))
 M6 = m.sqrt((2/0.4)*((1 + p0/p6 * ((1 + 0.4/2.8 *rho0/p0*V_c6**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
 print(M1, M2, M3, M4, M5, M6)
 "Measured total temperature"
+T_org=[]
+T_org=valueimport2(26,31,9,T_org)
+
 def TemptoK(T):
     TAT=T+273.15
     return TAT
@@ -165,14 +174,14 @@ T6 = TAT6 / (1+0.2*M6**2)
 
 "Calculate speed of sound"
 def SpeedofSound(lambda_1,R,T):
-    a=m.sqrt(lambda_1*R*T1)
+    a=m.sqrt(gamma*R*T1)
     return a
-a1 = m.sqrt(lambda_1*R*T1)
-a2 = m.sqrt(lambda_1*R*T2)
-a3 = m.sqrt(lambda_1*R*T3)
-a4 = m.sqrt(lambda_1*R*T4)
-a5 = m.sqrt(lambda_1*R*T5)
-a6 = m.sqrt(lambda_1*R*T6)
+a1 = m.sqrt(gamma*R*T1)
+a2 = m.sqrt(gamma*R*T2)
+a3 = m.sqrt(gamma*R*T3)
+a4 = m.sqrt(gamma*R*T4)
+a5 = m.sqrt(gamma*R*T5)
+a6 = m.sqrt(gamma*R*T6)
 
 "Calculate true airspeed"
 def TAS(M,a):
@@ -209,15 +218,20 @@ EAS5 = TAS5 * m.sqrt(rho5/rho0)
 EAS6 = TAS6 * m.sqrt(rho6/rho0)
 
 "Calculate lift coefficient for each measure point"
-lift_coefficient_1 = lift1 / (0.5*rho1*TAS1**2*S)
-lift_coefficient_2 = lift2 / (0.5*rho2*TAS2**2*S)
-lift_coefficient_3 = lift3 / (0.5*rho3*TAS3**2*S)
-lift_coefficient_4 = lift4 / (0.5*rho4*TAS4**2*S)
-lift_coefficient_5 = lift5 / (0.5*rho5*TAS5**2*S)
-lift_coefficient_6 = lift6 / (0.5*rho6*TAS6**2*S)
-lift_coefficients = [lift_coefficient_1, lift_coefficient_2, lift_coefficient_3,
-                     lift_coefficient_4, lift_coefficient_5, lift_coefficient_6]
-
+def lift_coefficient(fuel_used,hp,IAS,T_org) :
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444
+    M = m.sqrt((2/(gamma-1))*((1+(p0/p)*((1+(gamma-1)/(2*gamma)*(rho0/p0)*V_c**2)**(gamma/(gamma-1))-1))**((gamma-1)/gamma)-1))
+    TAT = T_org + 273.15
+    T = TAT / (1 + 0.2 * M ** 2)
+    a = m.sqrt(gamma * R * T)
+    TAS = M*a
+    rho = p / (R * T)
+    lift=(OEW + weight_fuel + weight_payload - fuel_used) * g0
+    return lift/(0.5*rho*S*TAS**2)
+lift_coefficients=[]
+for i in range(6):
+    lift_coefficients.append(lift_coefficient(fuel_used[i],hp[i],IAS[i],T_org[i]))
 "Plot CL-alpha figure"
 
 x = np.array(angle_of_attack)
@@ -239,40 +253,70 @@ print("Alpha_CL=0", zero_lift_angle_of_attack)
 "Print CL_alpha and alpha_CL0"
 print('CL_alpha:', mo)
 
-"Calculate thrust"
-Tp1 = 3475.18 +	3773.6
-Tp2 = 2645.67 + 2913.04
-Tp3 = 2244.59 +	2488.8
-Tp4 = 1707.67 + 1976.26
-Tp5 = 1708.71 +	1921.07
-Tp6 = 1901.78 +	2216.83
-Tp=[Tp1,Tp2,Tp3,Tp4,Tp5,Tp6]
+"Calculate temperature difference"
+delta_t=[]
+def deltat(T_org,hp,IAS):
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444
+    M = m.sqrt((2 / (gamma - 1)) * ((1 + (p0 / p) * (
+                (1 + (gamma - 1) / (2 * gamma) * (rho0 / p0) * V_c ** 2) ** (gamma / (gamma - 1)) - 1)) ** (
+                                                (gamma - 1) / gamma) - 1))
+    TAT = T_org + 273.15
+    T = TAT / (1 + 0.2 * M ** 2)
+    return T - (T0 + lambda0 * hp)
+for i in range(6):
+    delta_t.append(deltat(T_org[i],hp[i],IAS[i]))
+print(delta_t[0])
 
-"Calculate drag"
-def drag(angle,Thrust):
-    Drag=[]
-    for i in range(0,6):
-        D=Tp[i]
-        Drag.append(D)
-    return(Drag)
-D1 = Tp1
-D2 = Tp2
-D3 = Tp3
-D4 = Tp4
-D5 = Tp5
-D6 = Tp6
+"getting all inputs for the thrust file"
+def mach(hp,IAS) :
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444
+    M = m.sqrt((2/(gamma-1))*((1+(p0/p)*((1+(gamma-1)/(2*gamma)*(rho0/p0)*V_c**2)**(gamma/(gamma-1))-1))**((gamma-1)/gamma)-1))
+    return M
+M=[]
+for i in range(6):
+    M.append(mach(hp[i],IAS[i]))
+FFl=[]
+valueimport2(26,31,6,FFl)
+FFr=[]
+valueimport2(26,31,7,FFr)
+matlab=[]
+def lbshrtokgs(FuelFlow):
+    return lbstokg(FuelFlow)/3600
+
+for i in range(6):
+    lol=hp[i], M[i], delta_t[i], lbshrtokgs(FFl[i]), lbshrtokgs(FFr[i])
+    matlab.append(lol)
+
+f = open("matlab.dat", 'w+')
+for row in matlab:
+    for item in row:
+        f.write(str(item) + " ")
+    f.write("\n")#Nieuwe regel
+f.close()
+subprocess.Popen([r"C:\Users\lizzy\OneDrive\Documenten\Universiteit\2019-2020\SVV\Flight_Dynamics_Project\thrust(1).exe"])
+data = np.genfromtxt("thrust.dat")
+thrust=[]
+for i in range(6):
+    thrust.append(sum(data[i]))
 
 "Caclulate drag coefficient"
-def dragcoeffiecient(drag,rho,TAS,S):
-    CD=drag/(0.5*rho*TAS**2*S)
-    return CD
-CD1 = D1 / (0.5*rho1*TAS1**2*S)
-CD2 = D2 / (0.5*rho2*TAS2**2*S)
-CD3 = D3 / (0.5*rho3*TAS3**2*S)
-CD4 = D4 / (0.5*rho4*TAS4**2*S)
-CD5 = D5 / (0.5*rho5*TAS5**2*S)
-CD6 = D6 / (0.5*rho6*TAS6**2*S)
-drag_coefficients = [CD1, CD2, CD3,CD4, CD5, CD6]
+def dragcoeffiecient(thrust,hp,IAS,T_org):
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444
+    M = m.sqrt((2 / (gamma - 1)) * ((1 + (p0 / p) * (
+                (1 + (gamma - 1) / (2 * gamma) * (rho0 / p0) * V_c ** 2) ** (gamma / (gamma - 1)) - 1)) ** (
+                                                (gamma - 1) / gamma) - 1))
+    TAT = T_org + 273.15
+    T = TAT / (1 + 0.2 * M ** 2)
+    a = m.sqrt(gamma * R * T)
+    TAS = M * a
+    rho = p / (R * T)
+    return thrust/(0.5*rho*S*TAS**2)
+drag_coefficients=[]
+for i in range(6):
+    drag_coefficients.append(dragcoeffiecient(thrust[i],hp[i],IAS[i],T_org[i]))
 
 "Plot CD-alpha figure"
 plt.figure()
@@ -341,47 +385,38 @@ reynolds_number = [Re1, Re2, Re3, Re4, Re5, Re6]
 dCD_dCL2 = g #slope of CD-CL^2 plot
 
 "Calculate Oswald efficiency factor"
+
 oswald = 1 / (m.pi * A * dCD_dCL2)
 print('Oswald efficiency factor:', oswald)
 
 "Calculate reduced equivalent airspeed"
-def reducedV(TAT, fuel_used,IAS,hp):
+def reducedV(T_org, fuel_used,IAS,hp):
     p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
     weight_total = total_weight(fuel_used)
     V_c = (IAS - 2) * 0.514444444  # kts to m/s
     M = m.sqrt((2/0.4)*((1 + p0/p * ((1 + 0.4/2.8 *rho0/p0*V_c**2)**(1.4/0.4)-1))**(0.4/1.4) -1))
-    T = (TAT+273.15) / (1 + 0.2 * M ** 2)
-    a = m.sqrt(lambda_1 * R * T)
+    T = (T_org+273.15) / (1 + 0.2 * M ** 2)
+    a = m.sqrt(gamma * R * T)
     rho = p / (R * T)
     TAS = M * a
     EAS = TAS * m.sqrt(rho/rho0)
     Ve_bar = EAS * m.sqrt(standard_weight/weight_total)
-    print(rho1)
     return Ve_bar
-V_E1=reducedV(13.2,fuel_used[0],249,hp1)
-Ve_bar1 = EAS1 * m.sqrt(standard_weight / weight_total1)
-print(V_E1, Ve_bar1)
-
-
-Ve_bar2 = EAS2 * m.sqrt(standard_weight / weight_total2)
-Ve_bar3 = EAS3 * m.sqrt(standard_weight / weight_total3)
-Ve_bar4 = EAS4 * m.sqrt(standard_weight / weight_total4)
-Ve_bar5 = EAS5 * m.sqrt(standard_weight / weight_total5)
-Ve_bar6 = EAS6 * m.sqrt(standard_weight / weight_total6)
+Ve_bar=[]
+for i in range(6):
+    Ve_bar.append(reducedV(T_org[i],fuel_used[i],IAS[i],hp[i]))
 
 "Calculate standard thrust"
-standard_thrust1 = Tp1 / (0.5 * rho1 * Ve_bar1 * 2 * engine_inlet_diameter)
-standard_thrust2 = Tp2 / (0.5 * rho2 * Ve_bar2 * 2 * engine_inlet_diameter)
-standard_thrust3 = Tp3 / (0.5 * rho3 * Ve_bar3 * 2 * engine_inlet_diameter)
-standard_thrust4 = Tp4 / (0.5 * rho4 * Ve_bar4 * 2 * engine_inlet_diameter)
-standard_thrust5 = Tp5 / (0.5 * rho5 * Ve_bar5 * 2 * engine_inlet_diameter)
-standard_thrust6 = Tp6 / (0.5 * rho6 * Ve_bar6 * 2 * engine_inlet_diameter)
+def stanthrust(thrust,hp,IAS,T_org,fuel_used):
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444  # kts to m/s
+    M = m.sqrt(
+        (2 / 0.4) * ((1 + p0 / p * ((1 + 0.4 / 2.8 * rho0 / p0 * V_c ** 2) ** (1.4 / 0.4) - 1)) ** (0.4 / 1.4) - 1))
+    T = (T_org + 273.15) / (1 + 0.2 * M ** 2)
+    rho = p / (R * T)
+    Ve_bar=reducedV(T_org, fuel_used,IAS,hp)
+    return thrust / (0.5 * rho * Ve_bar * 2 * engine_inlet_diameter)
+standard_thrust=[]
+for i in range(6):
+    standard_thrust.append(stanthrust(thrust[i],hp[i],IAS[i],T_org[i],fuel_used[i]))
 
-"Calculate temperature difference"
-delta_t1 = T1 - (T0 + lambda0 * hp1)
-delta_t2 = T2 - (T0 + lambda0 * hp2)
-delta_t3 = T3 - (T0 + lambda0 * hp3)
-delta_t4 = T4 - (T0 + lambda0 * hp4)
-delta_t5 = T5 - (T0 + lambda0 * hp5)
-delta_t6 = T6 - (T0 + lambda0 * hp6)
-print(delta_t1)

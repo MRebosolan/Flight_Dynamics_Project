@@ -5,6 +5,7 @@ import control as control
 import pandas as pd
 #Asymmetric flight
 from scipy.io import loadmat
+from scipy.signal import find_peaks
 p0 = 101325 #pa
 rho0 = 1.225 #kg/m3
 T0 = 288.15 #K
@@ -16,6 +17,7 @@ OEW = 9165 * 0.45359237 #lbs to kg     CHECK!!!weights
 weight_fuel = 4050 * 0.45359237 #lbs to kg
 weight_payload = 695 #kg 
 g0 = 9.80665
+
 
 weight_payloadFL = 733 #kg
 weight_fuelEIG = 2750*0.45359237 #lbs to kg
@@ -79,8 +81,8 @@ fuel_left_used_FL = fuel_left_usedflight[:,0]
 
 #For plotting
 t_DutchRoll = 3163  #CHECKED 3164
-t_spiral = 3315    #tbd
-t_aperiodic = 3091   #tbd
+t_spiral = 3315-30    #tbd
+t_aperiodic = 3091-4   #tbd
 t_phugoid = 2812   #CHECKED 2815 for the data
 t_shortper = 2979   #
 
@@ -105,14 +107,14 @@ for i in range(20000,len(timesFL)):
 #t_lenphugoid = 
 #adjust time interval depending on current index
 ######################################
-current_index = phugoid_index  #INPUT
+current_index =spiral_index  #INPUT
 #################################        
 if current_index == phugoid_index or current_index==spiral_index:
-    time_eigenmotion = 150         #INPUT
+    time_eigenmotion = 160  #150        #INPUT
 if current_index == shortper_index:
     time_eigenmotion = 8 
 if current_index==DutchRoll_index or current_index==aperiodic_index:
-    time_eigenmotion = 20
+    time_eigenmotion = 19
 
 de_raw = de_FL[current_index: current_index + time_eigenmotion*10]        
 de = pi/180*(de_raw - de_raw[0]) #- de_raw[0]*pi/180
@@ -168,6 +170,25 @@ weight_totalFL = (OEW + weight_fuelEIG + weight_payloadFL - fuel_used_FL) * g0
 aileron = pi/180*da.reshape(time_eigenmotion*10) - da[0]*pi/180
 rudder = pi/180*dr.reshape(time_eigenmotion*10) - dr[0]*pi/180
 elevator = pi/180*de.reshape(time_eigenmotion*10) - de[0]*pi/180
+
+#aircraft dimensions
+S=30  #m^2
+c = 2.0569  #m
+b = 15.911 #m
+rho=rhoFL#Weigh   #INPUT
+W=weight_totalFL        #INPUT
+m=W/9.80665
+#m=13600*0.45359237
+mju_b = m/(rho*S*b)#7000*2*V/b
+mju_c = m/(rho*S*c)
+
+#aircraft Inertia
+Kxx2 = 0.019
+Kyy2= 1.3925
+Kzz2 = 0.042
+Kxz = 0.002
+
+V=V0
 #Initial vector
 
 u_init = 0*V0 
@@ -187,27 +208,77 @@ INIT_a = [beta_init, phi_init, p_init, r_init]
 
 t_shaped = (times - times[0]).reshape(time_eigenmotion*10)
 V_tas2=(V_tas-V_tas[0])/V_tas[0]
-
 '''
 plt.figure()
 plt.title('elevator/rudder/aileron')
-plt.plot(t_shaped, da)
-plt.plot(t_shaped, da_raw)
-
+plt.plot(t_shaped, de)
+'''
+for i in range(2,len(V_tas2)):
+    if V_tas2[i]>0 and V_tas2[i]<V_tas2[i-1] and V_tas2[i-1]>V_tas2[i-2]:
+        #print(V_tas2[i-1])
+        es=1
+'''plt.figure()
+plt.xlabel("time(s)")
+plt.ylabel("u")
+plt.plot(t_shaped, p)'''
 #plt.figure()
-#plt.plot(t_shaped, beta)
+#plt.plot(t_shaped, alphaFL)
 #plt.show()
-plt.figure()
-plt.plot(t_shaped, phi)
-plt.show()
-plt.figure()
-plt.plot(t_shaped, p)
-plt.show()
-plt.figure()
-plt.plot(t_shaped, r)
-plt.show()'''
+#plt.figure()
+#plt.plot(t_shaped, thetaFL)
+#plt.figure()
+#plt.plot(t_shaped, qFL)
+#plt.show()
 #Array = Flightdata['flightdata'][0][0]['Ahrs1_bYawRate']
+'''
+#which function to analyse?
+Function=r
 
+if Function[10]==thetaFL[10] or Function[10]==phi[10] or Function[10]==p[10] or Function[10]==r[10]:
+    corr = 1
+    if Function[10]==thetaFL[10]:
+        height1=0.06
+    else:
+        height1=0.006
+else:
+    corr=0
+    height1=0.01
+peaks = find_peaks(Function, height=height1, distance=30)
+fit_x = np.zeros(len(peaks[0])-corr)
+damping = np.zeros(len(peaks[0])-corr)
+for i in range(corr,len(peaks[0])):
+    fit_x[i-corr] = t_shaped[peaks[0][i]]
+    damping[i-corr] = Function[peaks[0][i]]
+
+#Get frequency, period and Damping ratio for flight data and then deduce parameters and eigs
+damp_funct=np.polyfit(fit_x, np.log(damping), 1)
+#function in form Ae^(bx)
+damp_A = exp(damp_funct[1])
+damp_b = damp_funct[0]   #real part of the eigenvalue!
+
+period = (fit_x[-1]-fit_x[0])/(len(fit_x)-1)
+T_12 = log(0.5)/damp_b
+
+eig_real = damp_b
+eig_imag = 2*pi/period
+
+wn = 2*pi/period
+w0=sqrt(eig_real**2 + eig_imag**2)
+damp_ratio = -eig_real/w0
+Cn_bFL = w0**2*2*mju_b*Kzz2*(b/V)**2
+Cn_rFL = -damp_ratio*4*sqrt(2*mju_b*Kzz2*Cn_bFL)
+
+ytab=[]
+xtab=[]
+s=0
+duration=time_eigenmotion*10
+for i in range(duration):
+    xtab.append(s)
+    y=damp_A*exp(damp_b*s)
+    ytab.append(y)
+    s=s+0.1
+#plt.plot(xtab,ytab)
+#plt.show()'''
 '''
 mju_c = 7000   ##INPUT ?
 #velocity

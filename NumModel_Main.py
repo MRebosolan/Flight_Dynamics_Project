@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import control as control
 from control.matlab import lsim
 from flight_data_reading import weight_totalFL, rhoFL,phi,p,r, alphaFL, thetaFL, qFL, V_tas2, alpha_0, theta_0,de,da,dr,times, time_eigenmotion, INIT_s, INIT_a, t_shaped, V0
-from scipy.interpolate import griddata 
+#from scipy.interpolate import griddata 
 
 #Asymmetric flight
 pFL=p
@@ -43,7 +43,27 @@ CL=2 * W / (rho * V ** 2 * S)    #INPUT
 #clean cruise (flaps up, gear up)
 xcg=0.25*c
 
-#Stability derivatives
+#Lateral force derivatives
+CY_b=-0.75         #DR -0.75
+CY_bdot = 0
+CY_p = -0.0304
+CY_r = 0.8495
+CY_da = -0.04
+CY_dr = 0.2300
+#Roll moment derivatives
+Cl_b = -0.1026
+Cl_p = -0.71085
+Cl_r = 0.2376   #10-23
+Cl_da = -0.23088 # 11-23
+Cl_dr = 0.0344  #18-34
+#Yam moment derivatives
+Cn_b =0.1348 #0.124
+Cn_bdot = 0
+Cn_p =-0.0202
+Cn_r = -0.2061#-0.2086 1766
+Cn_da = -0.0120 #0.0120
+Cn_dr = -0.0939   #0939'''
+'''#Stability derivatives MODIFIED for positive aileron defl.
 #Assymetric
 #Lateral force derivatives
 CY_b=-0.75         #DR -0.75
@@ -55,17 +75,39 @@ CY_dr = 0.2300
 #Roll moment derivatives
 Cl_b = -0.1026
 Cl_p = -0.71085
-Cl_r = 0.2376
-Cl_da = -0.23088
-Cl_dr = 0.0344
+Cl_r = 0.1176   #0.2376   10-23
+Cl_da = -0.02188 #0.23088  11-23
+Cl_dr = 0.0144 #0.0344  18-34
 #Yam moment derivatives
-Cn_b = 0.1348
+Cn_b =0.116 #0.1348 0.124
 Cn_bdot = 0
-Cn_p = -0.0602
-Cn_r = -0.2061   #DR -0.2061
-Cn_da = -0.0120
-Cn_dr = -0.0939
-
+Cn_p =-0.0202   #0.0602
+Cn_r = -0.1586  #DR -0.2061-0.2086
+Cn_da = -0.0120 #0.0120
+Cn_dr = -0.0809   #0939
+'''
+'''
+# THE ONES USED NOW
+CY_b=-0.75         #DR -0.75
+CY_bdot = 0
+CY_p = -0.0304
+CY_r = 0.8495
+CY_da = -0.04
+CY_dr = 0.2300
+#Roll moment derivatives
+Cl_b = -0.1026
+Cl_p = -0.71085
+Cl_r = 0.2776 #  10-23  2876
+Cl_da = -0.19088 # 0.19088  26088
+Cl_dr = 0.0244#  18-34   0204
+#Yam moment derivatives
+Cn_b =0.106 #0.124
+Cn_bdot = 0
+Cn_p =-0.0602   #0.0602
+Cn_r =  -0.171#-0.2086
+Cn_da = -0.0220 #0.0120
+Cn_dr = -0.0769   #0769  939
+'''
 #Symmetric
 CX_u = -0.095
 
@@ -275,15 +317,15 @@ for i in range(len(t)):
 #check   VERIFICATION!!!!
 UA=np.zeros((len(da_list),2))
 for rr in range(len(da_list)):
-    UA[rr,0] = da_list[rr]
-    UA[rr,1] = dr_list[rr]
+    UA[rr,0] = -da_list[rr]
+    UA[rr,1] = -dr_list[rr]
 UA2=np.zeros((len(da),2))
 for rr in range(len(da)):
     UA2[rr,0] = da[rr]
     UA2[rr,1] = dr[rr]   
     
 yout,Ts,xout = control.matlab.lsim(sys_Sym, de_list, t, INIT_s)
-youta,Ta,xouta = control.matlab.lsim(sys_Ass, -UA, t, INIT_a)
+youta,Ta,xouta = control.matlab.lsim(sys_Ass, -UA2, t_shaped, INIT_a)
 
 #plt.figure()
 #plt.title('simulation')
@@ -292,29 +334,53 @@ youta,Ta,xouta = control.matlab.lsim(sys_Ass, -UA, t, INIT_a)
 
 #a2=pi/180*(np.array(alpha))
 #theta2=pi/180*(np.array(theta))
+#lw = 2, c = ”#FF0000”, label = r”$\phi$ data”
+'''
+fig, axs = plt.subplots(4)
+fig.suptitle('Roll angle, roll rate, yaw rate, aileron/rudder deflections')
+#ax[0]=plt.subplot(111)
+ax[0].plot(t,da_list, label = r"$\delta_a$")
+ax[0].plot(t,dr_list, label = r"$\delta_r$")
+ax[0].legend(loc="upper right")'''
+plt.figure()
+plt.title('Aileron and rudder deflections')
 
-plt.figure()
-plt.title('elevator')
-plt.plot(t,de_list)
-plt.plot(t_shaped,de)
-plt.figure()
-plt.title('velocity')
-plt.plot(t,u)
-plt.plot(t_shaped,V_tas2)
-plt.figure()
-plt.title('roll, AoA')
-plt.plot(Ta,alpha)
-plt.plot(t_shaped,alphaFL)
+ax=plt.subplot(411)
+plt.ylabel('[rad]')
+ax.plot(t,da_list, label = r"$\delta_a$")
+ax.plot(t,dr_list, label = r"$\delta_r$")
+ax.legend(loc="upper right")
+
+plt.subplot(412)
+plt.ylabel('[rad]')
+plt.plot(t,phi, label = r"$\phi$ numerical")
+plt.plot(t_shaped,phiFL, label = r"$\phi$ flight data")
+plt.legend(loc="upper right")
+
+plt.subplot(413)
+plt.ylabel('[rad]')
+plt.plot(t,p, label = "p numerical")
+plt.plot(t_shaped,pFL, label = "p flight data")
+plt.legend(loc="upper right")
+
+plt.subplot(414)
+plt.xlabel("time(sec)")
+plt.ylabel('[rad]')
+plt.plot(t,r, label = "r numerical")
+plt.plot(t_shaped,rFL, label = "r flight data")
+plt.legend(loc="upper right")
+
+'''
 plt.figure()
 plt.title('RollRate, pitch')
-plt.plot(t,theta)
-plt.plot(t_shaped, thetaFL)
+plt.plot(t,p,label ="p numerical")
+plt.plot(t_shaped, pFL,label = "p flight data")
 plt.figure()
 plt.title('yawRate, pitchRate')
-plt.plot(t,q)
-plt.plot(t_shaped, qFL)
+plt.plot(t,r, label = "r numerical")
+plt.plot(t_shaped, rFL, label = "r flight data")
+'''
 plt.show()
-
 
 
 
@@ -369,3 +435,20 @@ lambdaSPIRAL = V/b*2*CL*(Cl_b*Cn_r - Cn_b*Cl_r)/(Cl_p*(CY_b*Cn_r + 4*mju_b*Cn_b)
 
 
 lambdaDUTCH2 = (Cn_b+Cn_r)/(4*mju_b*Kzz2)*V/b
+###RESIDUALS
+
+
+res_phi=[]
+res_p=[]
+res_r=[]
+for i in range(len(t_shaped)):
+    res_phi.append((youta[:,1][i]-phiFL[i])**2)
+    res_p.append((youta[:,2][i]-pFL[i])**2)
+    res_r.append((youta[:,3][i]-rFL[i])**2)
+RES1=sqrt(np.sum(res_phi))
+RES2=sqrt(np.sum(res_p))
+RES3=sqrt(np.sum(res_r))
+
+
+    
+print(RES1,RES2,RES3)
