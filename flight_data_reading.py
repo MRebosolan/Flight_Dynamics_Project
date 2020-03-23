@@ -6,6 +6,9 @@ import pandas as pd
 #Asymmetric flight
 from scipy.io import loadmat
 from scipy.signal import find_peaks
+S=30  #m^2
+c = 2.0569  #m
+b = 15.911 #m
 p0 = 101325 #pa
 rho0 = 1.225 #kg/m3
 T0 = 288.15 #K
@@ -84,7 +87,7 @@ t_DutchRoll = 3163  #CHECKED 3164
 t_spiral = 3315-30    #tbd
 t_aperiodic = 3091-4   #tbd
 t_phugoid = 2812   #CHECKED 2815 for the data
-t_shortper = 2979   #
+t_shortper = 2979-2   #
 
 
 for i in range(20000,len(timesFL)):
@@ -107,12 +110,12 @@ for i in range(20000,len(timesFL)):
 #t_lenphugoid = 
 #adjust time interval depending on current index
 ######################################
-current_index =spiral_index  #INPUT
+current_index = DutchRoll_index  #INPUT
 #################################        
 if current_index == phugoid_index or current_index==spiral_index:
-    time_eigenmotion = 160  #150        #INPUT
+    time_eigenmotion = 150  #150        #INPUT
 if current_index == shortper_index:
-    time_eigenmotion = 8 
+    time_eigenmotion = 8
 if current_index==DutchRoll_index or current_index==aperiodic_index:
     time_eigenmotion = 19
 
@@ -160,8 +163,10 @@ Mach = Mach_FL[current_index]
 tat = tat_FL[current_index]+273.15
 pressureFL = p0 * (1 + (lambda0*alt)/T0)**(-g0/(lambda0*R))
 TFL = tat/ (1+0.2*Mach**2)
-
+dynamic_viscosity = mu0*(TFL/T0)**(3/2)*((T0+S)/(TFL+S))
 rhoFL = pressureFL/R/TFL
+
+ReFL=rhoFL*V0*c/dynamic_viscosity
 
 fuel_used_FL = 0.45359237*(fuel_right_used_FL[current_index] + fuel_left_used_FL[current_index]) 
 weight_totalFL = (OEW + weight_fuelEIG + weight_payloadFL - fuel_used_FL) * g0
@@ -217,10 +222,14 @@ for i in range(2,len(V_tas2)):
     if V_tas2[i]>0 and V_tas2[i]<V_tas2[i-1] and V_tas2[i-1]>V_tas2[i-2]:
         #print(V_tas2[i-1])
         es=1
-'''plt.figure()
+'''
+plt.figure()
 plt.xlabel("time(s)")
 plt.ylabel("u")
-plt.plot(t_shaped, p)'''
+plt.plot(t_shaped, thetaFL)
+plt.show()
+'''
+'''
 #plt.figure()
 #plt.plot(t_shaped, alphaFL)
 #plt.show()
@@ -232,6 +241,7 @@ plt.plot(t_shaped, p)'''
 #Array = Flightdata['flightdata'][0][0]['Ahrs1_bYawRate']
 '''
 #which function to analyse?
+'''
 Function=r
 
 if Function[10]==thetaFL[10] or Function[10]==phi[10] or Function[10]==p[10] or Function[10]==r[10]:
@@ -279,106 +289,4 @@ for i in range(duration):
     s=s+0.1
 #plt.plot(xtab,ytab)
 #plt.show()'''
-'''
-mju_c = 7000   ##INPUT ?
-#velocity
-V=82.82
-#aircraft dimensions
-S=30  #m^2
-C = 2.0569  #m
-b = 15.911 #m
-rho=1.01 #SI
-#Weight
-mju_c = 6800/(rho*S*b)#7000*2*V/b   ##INPUT ?
 
-
-#aircraft Inertia
-Kxx2 = 0.019
-Kyy2= 1.3925
-Kzz2 = 0.042
-Kxz = 0.002
-
-#Aerodynamic coeffs
-CD_0 = 0.04
-CL_a = 5.084
-e=0.8
-CL=0.6    #INPUT ?
-
-#clean cruise (flaps up, gear up)
-xcg=0.25*C
-
-#Assymetric
-#Lateral force derivatives
-CX_u = -0.0279
-mju_c =
-Dc =
-CX_a = -0.4797
-CZ_0 =
-CX_q = -0.2817
-CZ_u = -0.3762
-CZ_a = -5.7434
-CZ_adot = -0.0035
-CX_0 =
-CZ_q = -5.6629
-CM_u = 0.0699
-CM_a = -0.5626
-CM_adot = 0.1780
-CM_q = -8.7941
-
-
-
-
-#Differential operators
-Dc = 1
-
-symM = np.matrix([[CX_u -2*mju_c*Dc, CX_a, CZ_0, CX_q],
-                   [CZ_u, CZ_a + (CZ_adot-2*mju_c)*Dc, -CX_0, CZ_q + 2*mju_c],
-                   [0, 0, -Dc, 1],
-                   [CM_u, CM_a + (CM_adot*Dc), 0, CM_q - 2*(mju_c*Kyy2*Dc)]])
-#Angles = [u,alpha,theta,q*c/V]
-RHS = np.matrix([[-CX_d],
-                 [-CZ_d],
-                 [0],
-                 [-CM_d]])
-#AilRud = [de]
-
-#GETTING TO STATE SPACE MODEL
-#xdot = [udot, adot, thetadot, qdot]
-#x[u,a,theta,q]
-
-#x[beta,phi,p,r]
-
-#make dimensionless mass
-#state space A=-C1^(-1)C2, B=-C1^(-1)C3
-
-C1 = np.matrix([[-2*mju_c*c/V,0,0,0],
-                [0,(CZ_adot-2*mju_c)*c/V,0,0],
-                [0,0,-u/V,0],
-                [0,CM_adot*u/V,0,-2*mju_c*Kyy2*u/V]])
-C2 = np.matrix([[CY_b, CL, b/2/V*CY_p, b/2/V*(CY_r - 4*mju_b)],
-                [0, 0, b/2/V, 0],
-                [Cl_b, 0, Cl_p*b/2/V, Cl_r*b/2/V],
-                [Cn_b, 0, Cn_p*b/2/V, Cn_r*b/2/V]])
-
-C3 = -RHS
-A=-np.linalg.inv(C1)*C2
-B=-np.linalg.inv(C1)*C3
-C=np.matrix([[1,0,0,0],
-             [0,1,0,0],
-             [0,0,1,0],
-             [0,0,0,1]])
-D=np.matrix([[0,0],
-             [0,0],
-             [0,0],
-             [0,0]])
-D=RHS
-eigs=np.linalg.eigvals(A)
-t=np.zeros(200)
-for i in range(1,200):
-    t[i]=t[i-1]+0.1
-sys=control.StateSpace(A,B,C,D)
-T0, yout = control.initial_response(sys, t, X0=[0.5,0.5,0.5,0.5])
-T1,yout1=control.step_response(sys,t,[0,0,0,0])
-plt.plot(T1,yout[3])
-plt.show()
-'''
