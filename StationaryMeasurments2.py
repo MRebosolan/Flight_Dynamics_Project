@@ -7,7 +7,8 @@ import math as m
 import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
-import csv
+class StationaryMeasurements2:
+
 
 "Import constants"
 S      = 30.00	          # wing area [m^2]
@@ -74,24 +75,6 @@ def total_weight(fuel_used):
 weight_total=[]
 for i in fuel_used:
     weight_total.append(total_weight(i))
-weight_total1 = weight_total[0]
-weight_total2 = weight_total[1]
-weight_total3 = weight_total[2]
-weight_total4 = weight_total[3]
-weight_total5 = weight_total[4]
-weight_total6 = weight_total[5]
-
-"Calculate lift"
-def lift(weight):
-    return weight
-lift=weight_total
-print(lift)
-lift1 = weight_total1
-lift2 = weight_total2
-lift3 = weight_total3
-lift4 = weight_total4
-lift5 = weight_total5
-lift6 = weight_total6
 
 "Transform IAS to CAS"
 IAS=[]
@@ -109,6 +92,16 @@ hp=np.array(hp)
 "Measured total temperature"
 T_org=[]
 T_org=valueimport2(rowbegin,rowend,9,T_org)
+
+"density calculation"
+def density(hp,IAS,T_org):
+    p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
+    V_c = (IAS - 2) * 0.514444444  # kts to m/s
+    M = m.sqrt(
+        (2 / 0.4) * ((1 + p0 / p * ((1 + 0.4 / 2.8 * rho0 / p0 * V_c ** 2) ** (1.4 / 0.4) - 1)) ** (0.4 / 1.4) - 1))
+    T = (T_org + 273.15) / (1 + 0.2 * M ** 2)
+    rho = p / (R * T)
+    return rho
 
 "Calculate lift coefficient for each measure point"
 def lift_coefficient(fuel_used,hp,IAS,T_org) :
@@ -159,7 +152,7 @@ def deltat(T_org,hp,IAS):
     return T - (T0 + lambda0 * hp)
 for i in range(lenrow):
     delta_t.append(deltat(T_org[i],hp[i],IAS[i]))
-print(delta_t[0])
+
 
 "getting all inputs for the thrust file"
 def mach(hp,IAS) :
@@ -172,7 +165,6 @@ for i in range(lenrow):
     M.append(mach(hp[i],IAS[i]))
 FFl=[]
 valueimport2(rowbegin,rowend,6,FFl)
-print(FFl)
 FFr=[]
 valueimport2(rowbegin,rowend,7,FFr)
 matlab=[]
@@ -194,7 +186,7 @@ data = np.genfromtxt("thrust.dat")
 thrust=[]
 for i in range(lenrow):
     thrust.append(sum(data[i]))
-print(thrust)
+
 "Caclulate drag coefficient"
 def dragcoeffiecient(thrust,hp,IAS,T_org):
     p = p0 * (1 + (lambda0 * hp) / T0) ** (-g0 / (lambda0 * R))
