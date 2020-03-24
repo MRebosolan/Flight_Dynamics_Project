@@ -18,9 +18,13 @@ class TestStationaryMeasurements2(unittest.TestCase):
 
     def test_total_weight(self):
         result1=StationaryMeasurments2.total_weight(0)
-        self.assertEqual(result1,(StationaryMeasurments2.OEW+StationaryMeasurments2.weight_payload+StationaryMeasurments2.weight_fuel)*StationaryMeasurments2.g0)
+        self.assertEqual(result1,
+                         (StationaryMeasurments2.OEW+StationaryMeasurments2.weight_payload+
+                          StationaryMeasurments2.weight_fuel)*StationaryMeasurments2.g0)
         result2=StationaryMeasurments2.total_weight(StationaryMeasurments2.weight_fuel)
-        self.assertEqual(round(result2,6),round((StationaryMeasurments2.OEW+StationaryMeasurments2.weight_payload)*StationaryMeasurments2.g0,6))
+        self.assertEqual(round(result2,6),
+                         round((StationaryMeasurments2.OEW+StationaryMeasurments2.weight_payload)*
+                               StationaryMeasurments2.g0,6))
 
     def test_fttom(self):
         result2=StationaryMeasurments2.fttom(20)
