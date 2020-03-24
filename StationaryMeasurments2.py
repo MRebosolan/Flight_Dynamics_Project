@@ -62,7 +62,7 @@ weight_fuel = lbstokg(sum((valueimport2(16,16,3,weight_fuel))))
 weight_payload=[]
 weight_payload=sum(valueimport2(6,14,7,weight_payload))
 g0 = 9.80665
-print((OEW+weight_payload+weight_fuel)*g0)
+
 fuel_used=[]
 fuel_used=valueimport2(rowbegin,rowend,8,fuel_used)
 for i in range(lenrow):
