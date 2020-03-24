@@ -41,7 +41,7 @@ alpha_3 = 3.6 * m.pi / 180 #degree to radians
 alpha_4 = 5.4 * m.pi / 180 #degree to radians
 alpha_5 = 8.7 * m.pi / 180 #degree to radians
 alpha_6 = 10.6 * m.pi / 180 #degree to radians
-angle_of_attack = [alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6]
+angle_of_attack =[alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6]
 
 "Calculate total weight at each measure point"
 OEW = 9165 * 0.45359237 #lbs to kg
