@@ -7,7 +7,6 @@ import math as m
 import pandas as pd
 import matplotlib.pyplot as plt
 import subprocess
-class StationaryMeasurements2:
 
 
 "Import constants"
@@ -56,14 +55,14 @@ for i in range(lenrow):
 
 
 def lbstokg(lbs):
-    return lbs*0.45359237
+    return round(lbs*0.45359237,7)
 OEW = lbstokg(9165)
 weight_fuel=[]
 weight_fuel = lbstokg(sum((valueimport2(16,16,3,weight_fuel))))
 weight_payload=[]
 weight_payload=sum(valueimport2(6,14,7,weight_payload))
 g0 = 9.80665
-
+print((OEW+weight_payload+weight_fuel)*g0)
 fuel_used=[]
 fuel_used=valueimport2(rowbegin,rowend,8,fuel_used)
 for i in range(lenrow):
