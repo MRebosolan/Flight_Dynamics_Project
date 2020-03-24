@@ -85,7 +85,7 @@ fuel_left_used_FL = fuel_left_usedflight[:,0]
 #For plotting
 t_DutchRoll = 3163  #CHECKED 3164
 t_spiral = 3315-30    #tbd
-t_aperiodic = 3091-4   #tbd
+t_aperiodic = 3091+7  #tbd
 t_phugoid = 2812   #CHECKED 2815 for the data
 t_shortper = 2979-2   #
 
@@ -110,14 +110,16 @@ for i in range(20000,len(timesFL)):
 #t_lenphugoid = 
 #adjust time interval depending on current index
 ######################################
-current_index = DutchRoll_index  #INPUT
+current_index=shortper_index  #INPUT
 #################################        
 if current_index == phugoid_index or current_index==spiral_index:
     time_eigenmotion = 150  #150        #INPUT
 if current_index == shortper_index:
     time_eigenmotion = 8
-if current_index==DutchRoll_index or current_index==aperiodic_index:
+if current_index==DutchRoll_index:
     time_eigenmotion = 19
+if current_index==aperiodic_index:
+    time_eigenmotion = 16
 
 de_raw = de_FL[current_index: current_index + time_eigenmotion*10]        
 de = pi/180*(de_raw - de_raw[0]) #- de_raw[0]*pi/180
@@ -125,8 +127,8 @@ de = pi/180*(de_raw - de_raw[0]) #- de_raw[0]*pi/180
 da_raw = da_FL[current_index: current_index + time_eigenmotion*10] 
 dr_raw = dr_FL[current_index: current_index + time_eigenmotion*10] 
 
-da=pi/180*(da_raw-da_raw[0])
-dr=pi/180*(dr_raw - dr_raw[0])
+da=pi/180*(da_raw)
+dr=pi/180*(dr_raw)
 
 times = timesFL[current_index: current_index + time_eigenmotion*10]
 
@@ -142,17 +144,17 @@ q_raw = q_FL[current_index: current_index + time_eigenmotion*10]
 qFL = pi/180*(q_raw-q_raw[0])
 
 phi_raw = phi_FL[current_index: current_index + time_eigenmotion*10]
-#phi = pi/180*(phi_raw.reshape(time_eigenmotion*10))
-phi = pi/180*(phi_raw - phi_raw[0])
+phi = pi/180*(phi_raw.reshape(time_eigenmotion*10))
+#phi = pi/180*(phi_raw - phi_raw[0])
 
 p_raw = p_FL[current_index: current_index + time_eigenmotion*10]
 p = pi/180*(p_raw - p_raw[0])
-#p = pi/180*(p_raw.reshape(time_eigenmotion*10))
+p = pi/180*(p_raw.reshape(time_eigenmotion*10))
 
 r_raw = r_FL[current_index: current_index + time_eigenmotion*10]
 r = pi/180*(r_raw - r_raw[0])
 
-#r = pi/180*(r_raw.reshape(time_eigenmotion*10))
+r = pi/180*(r_raw.reshape(time_eigenmotion*10))
 
 V_tas_raw = V_tas_FL[current_index: current_index + time_eigenmotion*10]
 V_tas = (V_tas_raw.reshape(time_eigenmotion*10))
@@ -172,8 +174,8 @@ fuel_used_FL = 0.45359237*(fuel_right_used_FL[current_index] + fuel_left_used_FL
 weight_totalFL = (OEW + weight_fuelEIG + weight_payloadFL - fuel_used_FL) * g0
 
 #aileron, rudder deflections /these lines mby not needed
-aileron = pi/180*da.reshape(time_eigenmotion*10) - da[0]*pi/180
-rudder = pi/180*dr.reshape(time_eigenmotion*10) - dr[0]*pi/180
+aileron = pi/180*da.reshape(time_eigenmotion*10) #- da[0]*pi/180
+rudder = pi/180*dr.reshape(time_eigenmotion*10) #- dr[0]*pi/180
 elevator = pi/180*de.reshape(time_eigenmotion*10) - de[0]*pi/180
 
 #aircraft dimensions
@@ -206,9 +208,9 @@ INIT_s = [u_init, alpha_init, theta_init, q_init]
 
 #Beta for spiral non-zero????
 beta_init =0
-phi_init = 0*phi_raw[0]*pi/180
-p_init = 0*p_raw[0]*pi/180
-r_init = 0*r_raw[0]*pi/180
+phi_init = phi_raw[0]*pi/180
+p_init = p_raw[0]*pi/180
+r_init = r_raw[0]*pi/180
 INIT_a = [beta_init, phi_init, p_init, r_init]
 
 t_shaped = (times - times[0]).reshape(time_eigenmotion*10)
@@ -288,5 +290,5 @@ for i in range(duration):
     ytab.append(y)
     s=s+0.1
 #plt.plot(xtab,ytab)
-#plt.show()'''
-
+#plt.show()
+'''
