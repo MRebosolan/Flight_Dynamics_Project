@@ -3,15 +3,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 import control as control
 from control.matlab import lsim
-from flight_data_reading import weight_totalFL, rhoFL,phi,p,r, alphaFL, thetaFL, qFL, V_tas2, alpha_0, theta_0,de,da,dr,times, time_eigenmotion, INIT_s, INIT_a, t_shaped, V0
-#from scipy.interpolate import griddata 
+from flight_data_reading import Mach,ReFL, weight_totalFL, rhoFL,phi,p,r, alphaFL, thetaFL, qFL, V_tas2, alpha_0, theta_0,de,da,dr,times, time_eigenmotion, INIT_s, INIT_a, t_shaped, V0
 
+M=Mach
+Re=ReFL/10**6
 #Asymmetric flight
 pFL=p
 rFL=r
 phiFL=phi
 #velocity  
-V=V0         #INPUTS
+V=V0    
 #104.7832256327374         #TAS
 theta0=theta_0
 #alpha0=0
@@ -34,11 +35,11 @@ Kxz = 0.002
 
 #Aerodynamic coeffs
 alpha0 = alpha_0             #INPUT!
-CD_0 = 0.021271
-CL_a = 4.8092325
-e=0.76406
+CD_0 = 0.020960087918583194
+CL_a = 4.7057685470413      
+e=0.7575807135250673
 CL=2 * W / (rho * V ** 2 * S)    #INPUT 
-#CD = CD_0 + (CL_a * alpha0) ** 2 / (pi * A * e) # Drag coefficient [ ]
+CD = CD_0 + (CL_a * alpha0) ** 2 / (pi * b/c * e) # Drag coefficient [ ]
 
 #clean cruise (flaps up, gear up)
 xcg=0.25*c
@@ -59,10 +60,32 @@ Cl_dr = 0.0344  #18-34
 #Yam moment derivatives
 Cn_b =0.1348 #0.124
 Cn_bdot = 0
-Cn_p =-0.0202
+Cn_p =-0.0602
 Cn_r = -0.2061#-0.2086 1766
 Cn_da = -0.0120 #0.0120
-Cn_dr = -0.0939   #0939'''
+Cn_dr = -0.0939   #0939
+
+#Lateral force derivatives #New aper.
+CY_b=-0.75         #DR -0.75
+CY_bdot = 0
+CY_p = -0.0304
+CY_r = 0.8495
+CY_da = -0.04
+CY_dr = 0.2300
+#Roll moment derivatives
+Cl_b = -0.1026
+Cl_p = -0.72085
+Cl_r = 0.2576 #  10-23  2876
+Cl_da = -0.18088 # 0.19088  26088
+Cl_dr = 0.0244#  18-34   0204
+#Yam moment derivatives
+Cn_b =0.111 #0.124
+Cn_bdot = 0
+Cn_p =-0.0202   #0.0602
+Cn_r =  -0.161#-0.2086
+Cn_da = -0.0220 #0.0120
+Cn_dr = -0.0769   #0769  939
+
 '''#Stability derivatives MODIFIED for positive aileron defl.
 #Assymetric
 #Lateral force derivatives
@@ -81,8 +104,8 @@ Cl_dr = 0.0144 #0.0344  18-34
 #Yam moment derivatives
 Cn_b =0.116 #0.1348 0.124
 Cn_bdot = 0
-Cn_p =-0.0202   #0.0602
-Cn_r = -0.1586  #DR -0.2061-0.2086
+Cn_p =-0.0602   #0.0602
+Cn_r = -0.2061  #DR -0.2061-0.2086
 Cn_da = -0.0120 #0.0120
 Cn_dr = -0.0809   #0939
 '''
@@ -103,33 +126,102 @@ Cl_dr = 0.0244#  18-34   0204
 #Yam moment derivatives
 Cn_b =0.106 #0.124
 Cn_bdot = 0
-Cn_p =-0.0602   #0.0602
+Cn_p =-0.0202   #0.0602
 Cn_r =  -0.171#-0.2086
 Cn_da = -0.0220 #0.0120
 Cn_dr = -0.0769   #0769  939
 '''
 #Symmetric
+
 CX_u = -0.095
 
 CX_a = 0.4797
 CZ_0 =-W*cos(theta0)/0.5/(rho*V**2*S)
 CX_q = -0.2817
-CZ_u = -0.37616
+CZ_u = -0.3762 #-0.37616
 CZ_a = -5.7434
 CZ_adot = -0.0035
 CX_0 =W*sin(theta0)/0.5/(rho*V**2*S)
 CZ_q = -5.6629
 Cm_u = 0.0699
-Cm_a = -0.5626              #INPUT
+Cm_a = -0.5099790386884853  #   -0.5626          #INPUT
 Cm_adot = 0.1780             #INPUT
 Cm_q = -8.7941
 CX_de=-0.0373
 CZ_de=-0.6961 
-Cm_de=-1.1642          #INPUT?
+Cm_de=-1.0850617844435857   #-1.1642       #INPUT?
 CX_dt=0
 CZ_dt=0
 Cm_dt=0
 
+'''
+#Tweaked 1NEW
+CX_u =-0.0935    #0.093  0.0905 needed
+
+CX_a = 0.4797
+CZ_0 =-W*cos(theta0)/0.5/(rho*V**2*S)
+CX_q = -0.2817  #not affecting
+CZ_u = -0.4636#-0.5436 need 1.0236 0.6236
+CZ_a = -5.7434
+CZ_adot = -0.0035
+CX_0 =W*sin(theta0)/0.5/(rho*V**2*S)
+CZ_q = -5.6629
+Cm_u = 0.0699
+Cm_a = -0.5099790386884853#-0.5626              #INPUT
+Cm_adot = 0.1780             #INPUT
+Cm_q = -7.3941   #-8.7941 7.39???
+CX_de=-0.0373
+CZ_de=-0.6961 
+Cm_de=-1.0850617844435857 #-1.1642          #INPUT?
+CX_dt=0
+CZ_dt=0
+Cm_dt=0
+'''
+'''#Tweaked 1
+CX_u =-0.093    #0.093  0.0905 needed
+
+CX_a = 0.4797
+CZ_0 =-W*cos(theta0)/0.5/(rho*V**2*S)
+CX_q = -0.2817  #not affecting
+CZ_u = -0.5436#-0.5436 need 1.0236 0.6236
+CZ_a = -5.7434
+CZ_adot = -0.0035
+CX_0 =W*sin(theta0)/0.5/(rho*V**2*S)
+CZ_q = -5.6629
+Cm_u = 0.0699
+Cm_a = -0.5099790386884853#-0.5626              #INPUT
+Cm_adot = 0.1780             #INPUT
+Cm_q = -7.5941   #-8.7941 7.39???
+CX_de=-0.0373
+CZ_de=-0.6961 
+Cm_de=-1.0850617844435857 #-1.1642          #INPUT?
+CX_dt=0
+CZ_dt=0
+Cm_dt=0
+'''
+'''
+#tweaked2
+CX_u =-0.093   #-0.095 0.083  0.0905 needed
+
+CX_a = 0.4797
+CZ_0 =-W*cos(theta0)/0.5/(rho*V**2*S)
+CX_q = -0.2817  #not affecting
+CZ_u = -0.4936#-0.37616 need 1.0236 0.6236
+CZ_a = -7.7434
+CZ_adot = -0.0035
+CX_0 =W*sin(theta0)/0.5/(rho*V**2*S)
+CZ_q = -5.6629
+Cm_u = 0.0699
+Cm_a = -0.5099790386884853#-0.5626              #INPUT
+Cm_adot = 0.1780             #INPUT
+Cm_q = -4.3941   #-8.7941
+CX_de=-0.0373 #not affecting
+CZ_de=-0.6961 
+Cm_de=-1.0850617844435857 #-1.1642          #INPUT?
+CX_dt=0
+CZ_dt=0
+Cm_dt=0
+'''
         
       #ASSYMETRIC
 #Differential operators
@@ -157,7 +249,7 @@ C2 = np.matrix([[CY_b, CL, b/2/V*CY_p, b/2/V*(CY_r - 4*mju_b)],
                 [0, 0, b/2/V, 0],
                 [Cl_b, 0, Cl_p*b/2/V, Cl_r*b/2/V],
                 [Cn_b, 0, Cn_p*b/2/V, Cn_r*b/2/V]])
-C3 = np.matrix([[-CY_da, -CY_dr],
+C3 = -np.matrix([[-CY_da, -CY_dr],
                  [0,0],
                  [-Cl_da, -Cl_dr],
                  [-Cn_da, -Cn_dr]])
@@ -179,7 +271,7 @@ dt = 0.008       #INPUT
 t=np.arange(0,T,dt)
 
 sys_Ass=control.StateSpace(A,B,C,C3)
-#T0, yout = control.initial_response(sys_Ass, t, X0=[0.5,0.5,0.5,0.5])
+T0, yout = control.initial_response(sys_Ass, t, X0=[0,0,0.5,0])
 #T1,yout1=control.step_response(sys_Ass,t,[0,0,0,0])
 '''plt.figure()
 plt.plot(T1,yout[0])
@@ -229,7 +321,6 @@ Xa = np.matrix([[INIT_a[0]],
                 [INIT_a[2]],
                 [INIT_a[3]]])
 
-#de_list = griddata(times, de, t, method = "linear")
 
 #interpolation for elevator deflection
 de_list=[]
@@ -286,7 +377,7 @@ u=[]
 alpha=[]
 theta=[]
 q=[]
-
+Vloop=V
 for i in range(len(t)):
     u.append(Xs[0,0])
     alpha.append(Xs[1,0])
@@ -294,15 +385,40 @@ for i in range(len(t)):
     q.append(Xs[3,0])
     
     Us = de_list[i]
+    CZ_0 =-W*cos(theta0)/0.5/(rho*Vloop**2*S)
+    CX_0 =W*sin(theta0)/0.5/(rho*Vloop**2*S)
+    C2s = np.matrix([[CX_u, CX_a, CZ_0,0],
+                [CZ_u, CZ_a, -CX_0, c/V*(CZ_q+2*mju_c)],
+                [0, 0, 0, c/V],
+                [Cm_u, Cm_a, 0, Cm_q*c/V]])
     
+    As=-np.linalg.inv(C1s)*C2s
     DXs = As*Xs + Bs*Us
     Xs = Xs + DXs*dt
-    
+    Vloop=u[i]*V+V
 beta=[]
 phi=[]
 p=[]
 r=[]
+Vloopa=V
+j=0
+k=0
 
+for i in range(len(t)):
+    beta.append(Xa[0,0])
+    phi.append(Xa[1,0])
+    p.append(Xa[2,0])
+    r.append(Xa[3,0])
+    
+    Ua = np.matrix([[da_list[i]],
+                    [dr_list[i]]])
+
+    #print(Xa[1,0])
+     #INPUT 
+    DXa = A*Xa + B*Ua
+    Xa = Xa + DXa*dt
+'''
+#A check
 for i in range(len(t)):
     beta.append(Xa[0,0])
     phi.append(Xa[1,0])
@@ -311,10 +427,24 @@ for i in range(len(t)):
     
     Ua = np.matrix([[-da_list[i]],
                     [-dr_list[i]]])
+    CL=2 * W / (rho * Vloopa ** 2 * S)  
+
+    C2 = np.matrix([[CY_b, CL, b/2/V*CY_p, b/2/V*(CY_r - 4*mju_b)],
+                    [0, 0, b/2/V, 0],
+                    [Cl_b, 0, Cl_p*b/2/V, Cl_r*b/2/V],
+                    [Cn_b, 0, Cn_p*b/2/V, Cn_r*b/2/V]])
+    j=j+1
+    if j>12:
+        j=0
+        Vloopa=V_tas2[k]*V+V
+        k=k+1
     #print(Xa[1,0])
+     #INPUT 
     DXa = A*Xa + B*Ua
     Xa = Xa + DXa*dt
+'''
 #check   VERIFICATION!!!!
+ 
 UA=np.zeros((len(da_list),2))
 for rr in range(len(da_list)):
     UA[rr,0] = -da_list[rr]
@@ -324,13 +454,19 @@ for rr in range(len(da)):
     UA2[rr,0] = da[rr]
     UA2[rr,1] = dr[rr]   
     
-yout,Ts,xout = control.matlab.lsim(sys_Sym, de_list, t, INIT_s)
+T2=20    #choose time range for plotting
+dt = 0.008       #INPUT
+t2=np.arange(0,T2,dt)
+yout,Ts,xout = control.matlab.lsim(sys_Sym, de, t_shaped, INIT_s)
 youta,Ta,xouta = control.matlab.lsim(sys_Ass, -UA2, t_shaped, INIT_a)
-
-#plt.figure()
-#plt.title('simulation')
-#plt.plot(Ta,youta[:,1])
-#plt.show()
+TIVP, yIVP = control.initial_response(sys_Sym, t2, X0=[0,0,0,1])
+'''
+plt.figure()
+plt.title('simulation')
+plt.plot(Ta,youta[:,1])
+plt.plot(Ta,youta[:,2])
+plt.plot(Ta,youta[:,3])
+plt.show()'''
 
 #a2=pi/180*(np.array(alpha))
 #theta2=pi/180*(np.array(theta))
@@ -341,10 +477,66 @@ fig.suptitle('Roll angle, roll rate, yaw rate, aileron/rudder deflections')
 #ax[0]=plt.subplot(111)
 ax[0].plot(t,da_list, label = r"$\delta_a$")
 ax[0].plot(t,dr_list, label = r"$\delta_r$")
-ax[0].legend(loc="upper right")'''
+ax[0].legend(loc="upper right")
+'''
+
 plt.figure()
 plt.title('Aileron and rudder deflections')
+u2=np.array(u)
 
+ax=plt.subplot(411)
+plt.ylabel('[rad]')
+ax.plot(t,de_list, label = r"$\delta_e$")
+ax.legend(loc="upper right")
+#plt.plot(t,u2*V0+V0, label = "V numerical")
+#plt.plot(t_shaped,V_tas2*V0+V0, label = "V flight data")
+plt.subplot(412)
+plt.ylabel('[m/s]')
+plt.plot(t,u2*V0+V0, label = "V numerical")
+plt.plot(t_shaped,V_tas2*V0+V0, label = "V flight data")
+plt.legend(loc="upper right")
+
+#plt.subplot(413)
+#plt.ylabel('[rad]')
+#plt.plot(t,alpha, label = r"$\alpha$ numerical")
+#plt.plot(t_shaped,alphaFL, label = r"$\alpha$ flight data")
+#plt.legend(loc="upper right")
+
+plt.subplot(413)
+plt.xlabel("time(sec)")
+plt.ylabel('[rad]')
+plt.plot(t,theta, label = r"$\theta$ numerical")
+plt.plot(t_shaped,thetaFL, label = r"$\theta$ flight data")
+plt.legend(loc="upper right")
+
+plt.subplot(414)
+plt.xlabel("time(sec)")
+plt.ylabel('[rad/s]')
+plt.plot(t,q, label = "q numerical")
+plt.plot(t_shaped,qFL, label = "qflight data")
+plt.legend(loc="upper right")
+
+MAXq=np.argmax(q)
+MAXqFL=np.argmax(qFL)
+
+for i in range(348,len(t)):
+    if q[i]<max(q)/2:
+        T12q=t[i]-t[MAXq]
+        break
+for i in range(28,len(t_shaped)):
+    if qFL[i]<max(qFL)/2:
+        T12qFL = t_shaped[i] - t_shaped[MAXqFL]
+        break
+    
+
+MAXanal=np.argmax(yIVP[2,:])
+for i in range(MAXanal-1,len(t2)):
+    if yIVP[2,i]<=max(yIVP[2,:])/2:
+        T12anal=t2[i]-t2[MAXanal]
+        break
+print(T12anal)
+
+'''
 ax=plt.subplot(411)
 plt.ylabel('[rad]')
 ax.plot(t,da_list, label = r"$\delta_a$")
@@ -358,18 +550,43 @@ plt.plot(t_shaped,phiFL, label = r"$\phi$ flight data")
 plt.legend(loc="upper right")
 
 plt.subplot(413)
-plt.ylabel('[rad]')
+plt.ylabel('[rad/s]')
 plt.plot(t,p, label = "p numerical")
 plt.plot(t_shaped,pFL, label = "p flight data")
 plt.legend(loc="upper right")
 
 plt.subplot(414)
 plt.xlabel("time(sec)")
-plt.ylabel('[rad]')
+plt.ylabel('[rad/s]')
 plt.plot(t,r, label = "r numerical")
 plt.plot(t_shaped,rFL, label = "r flight data")
 plt.legend(loc="upper right")
+'''
+'''
 
+u2=np.array(u)
+ax=plt.subplot(411)
+plt.title("Initial value problem " r"$\beta$")
+plt.ylabel('[rad]')
+ax.plot(TIVP,yIVP[0,:], label = r"$\beta$")
+ax.legend(loc="upper right")
+
+plt.subplot(412)
+plt.ylabel('[rad]')
+plt.plot(TIVP,yIVP[1,:], label = r"$\phi$")
+plt.legend(loc="upper right")
+
+plt.subplot(413)
+plt.ylabel('[rad/s]')
+plt.plot(TIVP,yIVP[2,:], label = "p")
+plt.legend(loc="upper right")
+
+plt.subplot(414)
+plt.xlabel("time(sec)")
+plt.ylabel('[rad/s]')
+plt.plot(TIVP,yIVP[3,:], label = "r")
+plt.legend(loc="upper right")
+'''
 '''
 plt.figure()
 plt.title('RollRate, pitch')
@@ -442,13 +659,13 @@ res_phi=[]
 res_p=[]
 res_r=[]
 for i in range(len(t_shaped)):
-    res_phi.append((youta[:,1][i]-phiFL[i])**2)
+    res_phi.append((youta[:,0][i]-phiFL[i])**2)
     res_p.append((youta[:,2][i]-pFL[i])**2)
     res_r.append((youta[:,3][i]-rFL[i])**2)
 RES1=sqrt(np.sum(res_phi))
 RES2=sqrt(np.sum(res_p))
 RES3=sqrt(np.sum(res_r))
 
-
     
 print(RES1,RES2,RES3)
+#print(eigsSYM)
