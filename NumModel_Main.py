@@ -132,7 +132,7 @@ Cn_da = -0.0220 #0.0120
 Cn_dr = -0.0769   #0769  939
 '''
 #Symmetric
-
+'''
 CX_u = -0.095
 
 CX_a = 0.4797
@@ -153,8 +153,8 @@ Cm_de=-1.0850617844435857   #-1.1642       #INPUT?
 CX_dt=0
 CZ_dt=0
 Cm_dt=0
-
 '''
+
 #Tweaked 1NEW
 CX_u =-0.0935    #0.093  0.0905 needed
 
@@ -176,7 +176,7 @@ Cm_de=-1.0850617844435857 #-1.1642          #INPUT?
 CX_dt=0
 CZ_dt=0
 Cm_dt=0
-'''
+
 '''#Tweaked 1
 CX_u =-0.093    #0.093  0.0905 needed
 
@@ -534,7 +534,7 @@ for i in range(MAXanal-1,len(t2)):
     if yIVP[2,i]<=max(yIVP[2,:])/2:
         T12anal=t2[i]-t2[MAXanal]
         break
-print(T12anal)
+#print(T12anal)
 
 '''
 ax=plt.subplot(411)
