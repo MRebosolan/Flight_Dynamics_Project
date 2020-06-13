@@ -110,7 +110,7 @@ for i in range(20000,len(timesFL)):
 #t_lenphugoid = 
 #adjust time interval depending on current index
 ######################################
-current_index=shortper_index  #INPUT
+current_index=phugoid_index  #INPUT
 #################################        
 if current_index == phugoid_index or current_index==spiral_index:
     time_eigenmotion = 150  #150        #INPUT
@@ -127,8 +127,8 @@ de = pi/180*(de_raw - de_raw[0]) #- de_raw[0]*pi/180
 da_raw = da_FL[current_index: current_index + time_eigenmotion*10] 
 dr_raw = dr_FL[current_index: current_index + time_eigenmotion*10] 
 
-da=pi/180*(da_raw)
-dr=pi/180*(dr_raw)
+da=pi/180*(da_raw-da_raw[0])
+dr=pi/180*(dr_raw-dr_raw[0])
 
 times = timesFL[current_index: current_index + time_eigenmotion*10]
 
@@ -145,16 +145,16 @@ qFL = pi/180*(q_raw-q_raw[0])
 
 phi_raw = phi_FL[current_index: current_index + time_eigenmotion*10]
 phi = pi/180*(phi_raw.reshape(time_eigenmotion*10))
-#phi = pi/180*(phi_raw - phi_raw[0])
+phi = pi/180*(phi_raw - phi_raw[0])
 
 p_raw = p_FL[current_index: current_index + time_eigenmotion*10]
 p = pi/180*(p_raw - p_raw[0])
-p = pi/180*(p_raw.reshape(time_eigenmotion*10))
+#p = pi/180*(p_raw.reshape(time_eigenmotion*10))
 
 r_raw = r_FL[current_index: current_index + time_eigenmotion*10]
 r = pi/180*(r_raw - r_raw[0])
 
-r = pi/180*(r_raw.reshape(time_eigenmotion*10))
+#r = pi/180*(r_raw.reshape(time_eigenmotion*10))
 
 V_tas_raw = V_tas_FL[current_index: current_index + time_eigenmotion*10]
 V_tas = (V_tas_raw.reshape(time_eigenmotion*10))
@@ -208,9 +208,9 @@ INIT_s = [u_init, alpha_init, theta_init, q_init]
 
 #Beta for spiral non-zero????
 beta_init =0
-phi_init = phi_raw[0]*pi/180
-p_init = p_raw[0]*pi/180
-r_init = r_raw[0]*pi/180
+phi_init = 0*phi_raw[0]*pi/180
+p_init = 0*p_raw[0]*pi/180
+r_init = 0*r_raw[0]*pi/180
 INIT_a = [beta_init, phi_init, p_init, r_init]
 
 t_shaped = (times - times[0]).reshape(time_eigenmotion*10)
